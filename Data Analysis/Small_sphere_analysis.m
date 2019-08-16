@@ -1,504 +1,254 @@
+%%Run 2
+% Loads run 2 data
+% Calibrates data 
+% Computes XYZ, xy and CIELAB
+
 %% Loads data
 
 clc, clear, close all
 
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data','Small Sphere');
+rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
 cd(rootdir)
 files= dir('*.mat');
 
-N = 10;                             % number of repetitions over time
-LN = 16;                            % number of lightness levels per repeat
+N = 30;                             % number of repetitions over time
+LN = 5;                            % number of lightness levels per repeat
 
 for j=1:length(files)
     
     load(fullfile(rootdir,files(j).name));  % load experimental results
-    %LABmatchFull(:,:,:,j)=LABmatch;         % pull in to composite
-    files(j).data=LABmatch;                 % pull in to composite 
-                                            %struct, rather than above 4D
-                                            %matrix - easier to iterate
-                                            %through matrices, but better
-                                            %link to other metadata in
-                                            %struct
+    files(j).dataLAB=LABmatch;
     files(j).dataRGB=RGBmatch;
-                                            
+    files(j).RGBstart=RGBstart;
+    files(j).Tmatch=Tmatch;
+    
 end
 
-clear LABmatch j
+clear LABmatch RGBmatch RGBstart Tmatch j
 
 %% Creates calibrated LAB values
 
-%pull data (RGB) 
-%RGBmatch
-%20(trials/files)*3(RGB)*16(L*)*10
+%load CIE data
+ciefile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Old (pre 20190816)\LM files\CIE colorimetric data\CIE_colorimetric_tables.xls';
+ciedata= xlsread(ciefile,'1931 col observer','A6:D86');
+% figure, plot(ciedata(:,1),ciedata(:,2),...
+%     ciedata(:,1),ciedata(:,3),
+%     ciedata(:,1),ciedata(:,4))
+% legend('show')
+cielambda=ciedata(:,1);
+Xcmf=ciedata(:,2);
+Ycmf=ciedata(:,3);
+Zcmf=ciedata(:,4);
 
-%load calibration file
-load('C:\Users\ucesars\Dropbox\UCL\Data\Large Sphere\Large LCD display measurement - Oct 2016.mat')
+for trial=1:length(files)
+    
+    %load calibration file
+    calFileLocation=fullfile(rootdir(1:end-11),'PR650',files(trial).name(1:end-4),...
+        'Large LCD display measurement.mat');
+    load(calFileLocation)
+    
+    %interpolate recorded values (sval) to required vals (0:1:255)
+    XYZinterp=zeros(3,256,4);
+    for i=1:3
+        for j=1:4
+            XYZinterp(i,:,j)=interp1(sval,XYZ(i,:,j),0:255,'spline');
+        end
+    end
+   
+    
+    %Interp screen spectral data to same interval as CIE data
+    RGBw_SPD = zeros(length(cielambda),1,'double');
+    RGBb_SPD = zeros(length(cielambda),1,'double');
+    
+    RGBw_SPD = interp1(lambda,Measurement(:,21,4),cielambda,'spline');
+    RGBb_SPD = interp1(lambda,Measurement(:,1,4),cielambda,'spline');   
+    
+    Norm = 100/sum(RGBw_SPD.*Ycmf);              % normalising factor
+    
+    DB = squeeze(RGBb_SPD);
+    Xb = sum(RGBb_SPD.*Xcmf)*Norm;
+    Yb = sum(RGBb_SPD.*Ycmf)*Norm;               % calculate white reference
+    Zb = sum(RGBb_SPD.*Zcmf)*Norm;
+    fprintf('%s Display black XYZ = %5.3f,%5.3f,%5.3f\n',files(trial).name(end-8:end-4),Xb,Yb,Zb);
+    
+    Xw = sum(RGBw_SPD.*Xcmf)*Norm;
+    Yw = sum(RGBw_SPD.*Ycmf)*Norm;               % calculate white reference
+    Zw = sum(RGBw_SPD.*Zcmf)*Norm;
+    fprintf('%s Display white XYZ = %5.3f,%5.3f,%5.3f\n',files(trial).name(end-8:end-4),Xw,Yw,Zw);  
+    xw(trial) = Xw/(Xw+Yw+Zw);  yw(trial) = Yw/(Xw+Yw+Zw);
+    
+    for j=1:3
+        % Thresholding:
+        % - original RGB values included out of gamut
+        % selections, resulting in above 1 and below 0 values
 
-%interpolate calibration file to single pixel val
-%load cie data
-%calculate chromaticities
-%convert to LAB
+        a=files(trial).dataRGB(j,:,:); %Create temporary variable
+        a(files(trial).dataRGB(j,:,:)>1)=1; % Threshold to below 1
+        a(files(trial).dataRGB(j,:,:)<0)=0; % Threshold to above 0
+        files(trial).dataRGBcal(j,:,:)=uint8(a*255); %Rescale
+        %dataRGBcal is not actually 'calibrated', perhaps innappropriate
+        %naming
+
+        files(trial).dataRGBcalgam(j,:,:)=files(trial).dataRGB(j,:,:)>1 ...
+            |files(trial).dataRGB(j,:,:)<0;
+
+    end
+    
+    files(trial).dataXYZ=zeros(3,LN,N);
+    files(trial).dataxy=zeros(2,LN,N);
+    files(trial).dataLABcal=zeros(3,LN,N);
+    
+    for j=1:LN
+        for k=1:N
+            files(trial).dataXYZ(:,j,k)=...
+                (XYZinterp(:,files(trial).dataRGBcal(1,j,k)+1,1)...
+                +XYZinterp(:,files(trial).dataRGBcal(2,j,k)+1,2)...
+                +XYZinterp(:,files(trial).dataRGBcal(3,j,k)+1,3));
+            
+            files(trial).dataxy(1,j,k)=...
+                files(trial).dataXYZ(1,j,k)/sum(files(trial).dataXYZ(:,j,k));
+            files(trial).dataxy(2,j,k)=...
+                files(trial).dataXYZ(2,j,k)/sum(files(trial).dataXYZ(:,j,k));
+            
+            files(trial).dataLABcal(:,j,k)=...
+                XYZToLab(files(trial).dataXYZ(:,j,k),[Xw;Yw;Zw]);
+        end
+    end
+end
 
 %% Create image files from rgb values
+%Could be made quicker by using already loaded data perhaps?
 
 for j=1:length(files)
     
-    load(fullfile(rootdir,files(j).name));  % load experimental results
-
+    %load(fullfile(rootdir,files(j).name));  % load experimental results
+    
     b = 40;                         % pixels in box side
     s = 4;                          % spacing between boxes
     w = s+N*(b+s);                  % width of array (iteration axis)
     h = s+LN*(b+s);                 % height of array (lightness axis)
     Im = zeros(h,w,3,'uint8');      % image array
-
+    
     for n = 1:N
-      xp = s+(n-1)*(b+s);                    % x pixel address (iteration axis)
-      for i = 1:LN
-        rs = RGBmatch(1,i,n);                % get R value (display signal, 8-bit)
-        gs = RGBmatch(2,i,n);
-        bs = RGBmatch(3,i,n);
-        yp = s+(i-1)*(b+s);                  % y pixel address (lightness axis)
-        Im(yp:yp+b-1,xp:xp+b-1,1) = uint8(255*rs);  % fill one square in array
-        Im(yp:yp+b-1,xp:xp+b-1,2) = uint8(255*gs);
-        Im(yp:yp+b-1,xp:xp+b-1,3) = uint8(255*bs);
-      end
+        xp = s+(n-1)*(b+s);                    % x pixel address (iteration axis)
+        for i = 1:LN
+            rs = files(j).dataRGBcal(1,i,n);                % get R value (display signal, 8-bit)
+            gs = files(j).dataRGBcal(2,i,n);
+            bs = files(j).dataRGBcal(3,i,n);
+            yp = s+(i-1)*(b+s);                  % y pixel address (lightness axis)
+            Im(yp:yp+b-1,xp:xp+b-1,1) = rs;  % fill one square in array
+            Im(yp:yp+b-1,xp:xp+b-1,2) = gs;
+            Im(yp:yp+b-1,xp:xp+b-1,3) = bs;
+        end
     end
-
+    
     iname = fullfile(rootdir,sprintf('%s.tif',files(j).name(1:end-4)));
     %imwrite(Im,iname,'tif');           % write the image
     
 end
 
-%% Plot medians by session
-cla
 
-highL=70;   %max 85
-lowL=10;    %min 10
-scaler=2;   %size of points
-
-hold on
-for i=1:length(files)
-    for j=18-highL/5:18-lowL/5
-        pause(0.05)
-
-        A(i,j)=median(files(i).data(2,j,:));
-        B(i,j)=median(files(i).data(3,j,:));
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(A(i,j),B(i,j),(17-j)^scaler,[1,.6,.6],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-            else
-                sc2= scatter(A(i,j),B(i,j),(17-j)^scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-            end
-        else
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(A(i,j),B(i,j),(17-j)^scaler,[.6,.6,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-            else
-                sc4= scatter(A(i,j),B(i,j),(17-j)^scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-            end
-        end
-    end
-    axis([-7 25 -45 5])
-    axis('equal')
-end
-
-
-
-legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-title(sprintf('Median across each session, for L=%d to L=%d',lowL,highL));
-xlabel('A')
-ylabel('B')
-
-% plot zero lines
-currentaxes=gca;
-plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-
-%% Plot heavy medians
-cla
-
-highL=70;   %max 85
-lowL=10;    %min 10
-scaler=5;   %size of points
-
-hold on
-for i=1:length(files)
-        pause(0.05)
-
-        A(i)=median(median(files(i).data(2,:,:)));
-        B(i)=median(median(files(i).data(3,:,:)));
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(A(i),B(i),2^scaler,[1,.6,.6],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-            else
-                sc2= scatter(A(i),B(i),2^scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-            end
-        else
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(A(i),B(i),2^scaler,[.6,.6,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-            else
-                sc4= scatter(A(i),B(i),2^scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-            end
-        end
-
-    text(median(median(files(i).data(2,:,:)))-30, ...
-    median(median(files(i).data(3,:,:))),...
-    files(i).name(6:end-6))
-    axis([-20 35 -60 20])
-    axis('equal')
-end
-
-
-
-legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-title(sprintf('Median across each session, for L=%d to L=%d',lowL,highL));
-xlabel('A')
-ylabel('B')
-
-% plot zero lines
-currentaxes=gca;
-plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-
-%% Plot all data
-%cla
-figure,
-highL=85;   %max 85
-lowL=10;    %min 10
-scaler=1;   %size of points
-
-hold on
-for i=1:length(files)
-    for j=18-highL/5:18-lowL/5
-        pause(0.1)
-
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(   squeeze(files(i).data(2,j,:)),...
-                                squeeze(files(i).data(3,j,:))...
-                    ,(17-j)^scaler,[1,.6,.6],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-            else
-                sc2= scatter(   squeeze(files(i).data(2,j,:)),...
-                                squeeze(files(i).data(3,j,:))...
-                    ,(17-j)^scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-            end
-        else
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(   squeeze(files(i).data(2,j,:)),...
-                                squeeze(files(i).data(3,j,:))...
-                    ,(17-j)^scaler,[.6,.6,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-            else
-                sc4= scatter(   squeeze(files(i).data(2,j,:)),...
-                                squeeze(files(i).data(3,j,:))...
-                    ,(17-j)^scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-            end
-       end
-       
-    end
-    text(median(median(files(i).data(2,:,:)))-30, ...
-        median(median(files(i).data(3,:,:))),...
-        files(i).name(6:end))
-   % axis([-20 35 -60 20])
-    axis('equal')
-end
-
-
-
-legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-title(sprintf('Median across each session, for L=%d to L=%d',lowL,highL));
-xlabel('A')
-ylabel('B')
-
-% plot zero lines
-currentaxes=gca;
-plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-
-%% Plot all data, by run
-cla
-
-highL=85;   %max 85
-lowL=10;    %min 10
-scaler=20;   %size of points
-ptime=0.2;
-fadecol=[0.9,0.9,0.9];
-
-
-hold on
-for i=1:length(files)
-    for j=1:10
-
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(   squeeze(files(i).data(2,:,j)),...
-                                squeeze(files(i).data(3,:,j))...
-                    ,scaler,[1,.6,.6],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-                pause(ptime);sc1.CData=fadecol;
-            else
-                sc2= scatter(   squeeze(files(i).data(2,:,j)),...
-                                squeeze(files(i).data(3,:,j))...
-                    ,scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-                pause(ptime);sc2.CData=fadecol;
-            end
-        else
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(   squeeze(files(i).data(2,:,j)),...
-                                squeeze(files(i).data(3,:,j))...
-                    ,scaler,[.6,.6,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-                pause(ptime);sc3.CData=fadecol;
-            else
-                sc4= scatter(   squeeze(files(i).data(2,:,j)),...
-                                squeeze(files(i).data(3,:,j))...
-                    ,scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-                pause(ptime);sc4.CData=fadecol;
-            end
-       end
-       
-    end
-    text(median(median(files(i).data(2,:,:)))-30, ...
-        median(median(files(i).data(3,:,:))),...
-        files(i).name(6:end-6))
-  %  axis([-20 35 -60 20])
-    axis('equal')
-end
-
-
-
-legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-title(sprintf('Median across each session, for L=%d to L=%d',lowL,highL));
-xlabel('A')
-ylabel('B')
-
-% plot zero lines
-currentaxes=gca;
-plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-
-%% Plot average of runs end-3 and end-1
-
-cla
-
-highL=70;   %max 85
-lowL=10;    %min 10
-scaler=2;   %size of points
-
-hold on
-for i=1:length(files)
-    %figure, hold on
-    for j=18-highL/5:18-lowL/5
-        pause(0.02)
-
-        A(i,j)=mean(files(i).data(2,j,end-3:end-1));
-        B(i,j)=mean(files(i).data(3,j,end-3:end-1));
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(A(i,j),B(i,j),(17-j)^scaler,[1,.9,.9],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-            else
-                sc2= scatter(A(i,j),B(i,j),(17-j)^scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-            end
-        else
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(A(i,j),B(i,j),(17-j)^scaler,[.9,.9,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-            else
-                sc4= scatter(A(i,j),B(i,j),(17-j)^scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-            end
-        end
-    end
-    axis([-7 25 -45 5])
-    axis('equal')
-    text(median(median(files(i).data(2,:,:)))-30, ...
-        median(median(files(i).data(3,:,:))),...
-        files(i).name(6:end-6))
-end
-
-
-
-legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-title(sprintf('Median across each session, for L=%d to L=%d',lowL,highL));
-xlabel('A')
-ylabel('B')
-
-% plot zero lines
-currentaxes=gca;
-plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-
-%% Stats
-% Two-sample Two-diensional Kolmogorov-Smirnov Test
-% kstest_2s_2d(ABs of 1, ABs of 2)
-light0=[];
-light1=[];
-
-for i=1:length(files)
-    if files(i).name(end-4)=='0'
-        light0=[light0,files(i).data(2:3,:,:)];
-    elseif files(i).name(end-4)=='1'
-        light1=[light1,files(i).data(2:3,:,:)];
-    end
-end
-
-light0=permute(reshape(light0,[2,1600]),[2,1]);
-light1=permute(reshape(light1,[2,1600]),[2,1]);
-
+%% Plot all data in LAB
 figure, hold on
-scatter(light0(:,1),light0(:,2),'.');
-scatter(light1(:,1),light1(:,2),'.');
-axis equal
-
-[a1,a2]=kstest_2s_2d(light0,light1)
-
-%% Stats for heavy medians
-% Two-sample Two-diensional Kolmogorov-Smirnov Test
-% kstest_2s_2d(ABs of 1, ABs of 2)
-light0=[];
-light1=[];
+obs='DG';
+markerSize=25;
 
 for i=1:length(files)
-    A(i)=median(median(files(i).data(2,:,:)));
-    B(i)=median(median(files(i).data(3,:,:)));
-    
-    if files(i).name(end-4)=='0'
-        light0=[light0;[A(i),B(i)]];
-    elseif files(i).name(end-4)=='1'
-        light1=[light1;[A(i),B(i)]];
+    for j=1:LN
+        if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
+            %pause(1)
+            if strcmp(files(i).name(end-5:end-4),'RB')
+                sc1= scatter3(   squeeze(files(i).dataLABcal(2,j,:)),...
+                    squeeze(files(i).dataLABcal(3,j,:)),...
+                    squeeze(files(i).dataLABcal(1,j,:))...
+                    ,markerSize,[1,.1,.1],'filled');
+                
+            elseif strcmp(files(i).name(end-5:end-4),'AU')
+                sc2= scatter3(   squeeze(files(i).dataLABcal(2,j,:)),...
+                    squeeze(files(i).dataLABcal(3,j,:)),...
+                    squeeze(files(i).dataLABcal(1,j,:))...
+                    ,markerSize,[0,.8,0],'filled');
+            end
+        end
     end
 end
 
-figure, hold on
-scatter(light0(:,1),light0(:,2),'r');
-scatter(light1(:,1),light1(:,2),'b');
-axis equal
+title(obs)
+axis('equal')
+xlabel('a*')
+ylabel('b*')
+zlabel('L*')
+set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
 
-[a1,a2]=kstest_2s_2d(light0,light1)
+currentaxes=gca;
+plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
+plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
 
-%% Plot time course
+%%
+%Short version
+%figure, hold on
+plotCIE(3,Xcmf,Ycmf,Zcmf)
+colSpace='xy';
+markerSize=20;
+view(3)
 
-
-for run=1:10
-    fig=figure('units','normalized','outerposition',[0 0 1 1]); hold on
-    for i=1:length(files)
-        pause(0.5)
-        for j=18-highL/5:18-lowL/5
+if strcmp(colSpace,'LAB')
+    for i=[2,5,6,3,1,4]
+        d=reshape(files(i).dataLABcal,3,150);
+        scatter3(d(2,:),d(3,:),d(1,:),'filled','DisplayName',...
+            sprintf('%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
+    end
+elseif strcmp(colSpace,'xy')
+    for i=[2,5]%[2,5,6,3,1,4]
+        d=reshape(files(i).dataxy,2,150);
+        d2=reshape(files(i).dataXYZ,3,150);
+        for i=1:150
+            s=scatter3(d(1,i),d(2,i),d2(2,i),markerSize,'filled','b');
+            if i==2
+                s.CData=[1,0,0];
+            end
+            %scatter3(d(1,i),d(2,i),d2(2,i),markerSize,'filled','DisplayName',...
+            %sprintf('%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
+            set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
             
-            if files(i).name(end-4)=='0'
-                if str2num(files(i).date(13:14))>12
-                    sc1= scatter(files(i).data(2,j,run),...
-                        files(i).data(3,j,run)...
-                        ,(17-j)^scaler,[1,.6,.6],'filled', ...
-                        'DisplayName','Light 0, PM'); % light red = light 0, PM
-                else
-                    sc2= scatter(files(i).data(2,j,run),...
-                        files(i).data(3,j,run)...
-                        ,(17-j)^scaler,[.8,.2,.2],'filled',...
-                        'DisplayName','Light 0, AM'); % dark red = light 0, AM
-                end
-            else
-                if str2num(files(i).date(13:14))>12
-                    sc3= scatter(files(i).data(2,j,run),...
-                        files(i).data(3,j,run)...
-                        ,(17-j)^scaler,[.6,.6,1],'filled',...
-                        'DisplayName','Light 1, PM'); % light blue = light 1, PM
-                else
-                    sc4= scatter(files(i).data(2,j,run),...
-                        files(i).data(3,j,run)...
-                        ,(17-j)^scaler,[.2,.2,.8],'filled',...
-                        'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-                end
-            end
-        end
-        axis([-20 40 -45 5])
-        axis('equal')
-    end
-    
-    legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-    title(sprintf('All sessions, Run %d, L=%d to L=%d',run,lowL,highL));
-    xlabel('A')
-    ylabel('B')
-    
-    % plot zero lines
-    currentaxes=gca;
-    plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-    plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-    axis([-20 40 -45 5])
-    
-    %saveas(fig,strcat(num2str(run),'.tif'))
-end
-
-%% Plot each L* val
-
-highL=85;   %max 85
-lowL=10;    %min 10
-scaler=32;   %size of points
-
-for j=18-highL/5:18-lowL/5
-    fig=figure('units','normalized','outerposition',[0 0 1 1]); hold on
-    
-    for i=1:length(files)
-        pause(0.3)        
-        if files(i).name(end-4)=='0'
-            if str2num(files(i).date(13:14))>12
-                sc1= scatter(files(i).data(2,j,:),...
-                    files(i).data(3,j,:)...
-                    ,scaler,[1,.6,.6],'filled', ...
-                    'DisplayName','Light 0, PM'); % light red = light 0, PM
-            else
-                sc2= scatter(files(i).data(2,j,:),...
-                    files(i).data(3,j,:)...
-                    ,scaler,[.8,.2,.2],'filled',...
-                    'DisplayName','Light 0, AM'); % dark red = light 0, AM
-            end
-        elseif files(i).name(end-4)=='1'
-            if str2num(files(i).date(13:14))>12
-                sc3= scatter(files(i).data(2,j,:),...
-                    files(i).data(3,j,:)...
-                    ,scaler,[.6,.6,1],'filled',...
-                    'DisplayName','Light 1, PM'); % light blue = light 1, PM
-            else
-                sc4= scatter(files(i).data(2,j,:),...
-                    files(i).data(3,j,:)...
-                    ,scaler,[.2,.2,.8],'filled',...
-                    'DisplayName','Light 1, AM'); % dark blue = light 1, AM
-            end
-        else
-            error('error: no AM/PM signifier in filename')            
+            drawnow
+            pause(0.01)
         end
     end
-    axis([-40 80 -90 30])
-    axis('equal')
+end
+legend('show')
+%set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
 
-    legend([sc1(1),sc2(1),sc3(1),sc4(1)],'location','southwest')
-    title(sprintf('All sessions, all runs, L* = %d',-5*(j-18)));
-    xlabel('A')
-    ylabel('B')
-    
-    % plot zero lines
-    currentaxes=gca;
-    plot([currentaxes.XLim],[0,0],'Color',[.8,.8,.8]);
-    plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
-    axis([-40 80 -90 30])
-    
-    saveas(fig,strcat(num2str(-5*(j-18)),'.tif'))
+%% Plot all data in CIE 1931 xy
+obs='ALL';
+markerSize=[1:30];%25;
+
+figure, hold on
+
+for i=1:length(files)
+    for j=1:LN
+        if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
+            %pause(1)
+            if strcmp(files(i).name(end-5:end-4),'RB')
+                sc1= scatter3(   squeeze(files(i).dataxy(1,j,:)),...
+                    squeeze(files(i).dataxy(2,j,:)),...
+                    squeeze(files(i).dataXYZ(2,j,:))...
+                    ,markerSize,[1,.1,.1],'filled');
+                
+            elseif strcmp(files(i).name(end-5:end-4),'AU')
+                sc2= scatter3(   squeeze(files(i).dataxy(1,j,:)),...
+                    squeeze(files(i).dataxy(2,j,:)),...
+                    squeeze(files(i).dataXYZ(2,j,:))...
+                    ,markerSize,[0,.8,0],'filled');
+            end
+        end
+    end
 end
 
-
-
+title(obs)
+%axis('equal')
+xlabel('x')
+ylabel('y')
+zlabel('Y')
+set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
 
