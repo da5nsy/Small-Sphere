@@ -1,0 +1,131 @@
+%% edit - added names
+
+2017-3-8-9-48_1
+
+First full run, many observations, need to procure dictaphone.
+
+Darkest 2, and sometimes darkest 3, are particularly problematic. Generally, need to be more red than slider allows for, though colour discrimination particularly difficult at these levels (many options are satisfactory, as opposed to brighter conditions where there is only a very narrow area of acceptability)
+
+- There is a strange sensation of there being variance across the patch, and slightly movement of the head (in particular up and down) cause variation - specifically lighter/darker. Tried such movement for a brighter colour and colour change evident (minor - from yellow to more orange yellow).
+Today was running with head mount not attached, just held on by head pressure. Not uncomfortable to try, but slightly uncomfortable after time, and not good for keeping head stable - see above. Will consider ways to secure facemask.
+
+Connection issue - with micro usb connection to fidget board (I think). Occurred twice, once at first measurement (perhaps first or possibly even first 2 measurements might be dud), and once about halfway through (after this one - I purposefully recorded 2 readings at extreme organge, as far down as both sliders would go, in order to show where the problem had occured). Seemed to correct itself, sometimes with a slight wiggle required. Will consider ways to move board away from area of possible contact with hands. 
+
+Light proofing seems to be working.
+Blutacked ring to rear of sphere, seems satisfactory.
+Was useful to have sound on matlab laptop - alerted me to device connection/disconnection issues above.
+Took no spectral measurement of light source before/after - shall do at some point.
+
+Changed file renaming structure.
+Total changes to matlab script: 
+Changed position and size or patch.
+Changed file naming and location. (New folder: 'C:/Test/Experiment - Mar 2017', now saving both matlab filesk and text files there)
+
+2017-3-8-18-1_0
+
+Before: 2-5 in floor 10 TAP class. Daylight plus artificial lighting, 5 mins walk back to basement.
+Nothing major to note on afternoon session.
+Listened to podcasts, shall do so from now on.
+Took a while for the sliders to start working for some reason.
+Didn't get a chance to consider face mask attachment yet.
+File naming change seems to have worked OK.
+
+2017-3-9-10-6_0
+Before: Got train to work. Feeling slightly rough (tired, beer and curry with Jenny night before)
+Dropped sphere down by a couple of inches midway through trials. Turns out I slump slightly after some time sat in the same position.
+
+2017-3-9-18-35_1
+Before: Sunny day, blue sky, walked to Angel after lunch, sat in 3 phone shop for a while, got bus back to UCL (reading on phone), then came to basement via breif stop at upstairs desk. Starting to get dark as I came in. Started later than planned.
+About 2/3 way through started getting headache eyestrain. Took headphones off as sound was feeling unpleasant.
+
+2017-3-13-9-58_1
+Before: early morning but feeling quite awake. Had breakfast in Euston Leon, checked emails at Euston, then met with Stuart in his office for roughy 20 minutes.
+Noticed that this computer's clock is 14 minutes slow, bizarre.
+A couple of the low luminance patches, couldn't make them red enough - one time majorly so.
+
+2017-3-13-18-6_0
+Before: computer work in office.
+Lunch outside in the sun.
+Unusually, there were many patches that I could not make blue enough.
+There was residual warmth/beige-ness, particularly in the lower luminances but in this session it was more general (across a greater range of luminances) also.
+
+2017-3-14-9-55_0
+Before: Early morning, had porridge in quad, grey day but quite bright.
+Messed up midway - a connection issue. Pulled 2 (or possibly 3) strong orange/red hits to denote.
+Didn't struggle to make matches within available range. Started off very precise (slow?) actively thinking about making a sensation match rather than a paper match.
+
+2017-3-14-18-36_1
+Really struggled. My eyes hurt, I am tired. 
+
+2017-3-15-10-20_1
+Before: in the basement for 30 mins beforehand, checking email.
+Mess up mid way (at the start of tial 6?) - I noticed that there was a small amount of light coming in through the mask at the bottom right, from the control computer.
+To counteract this I tilted the screen down (my usual tactic, which had worked up until this point), but this time this put the computer to sleep. I tried to bring it back without removing my face from the mask, but was unsuccessful. So, I removed my face from the mask, and worked with the computer for roughly 1 minute. Luckily, the trail had not been interrupted by this sleep session, though I did have to manually move the stimulus back on to the second screen. This break in the middle of the session may render this data unuseable.
+
+2017-3-15-18-16_0
+Before: computer work in office, came straight down to basement.
+Found that run fairly easy going. Starting to get stiff shoulders and back from a few days of this now. 
+Didn't struggle to find matches.
+
+2017-3-16-10-5_0
+Before: emails in office, then shower at IoM, then straight to the basement.
+Nothing out of the ordinary to report.
+Phone stopped playing podcasts 2/3 of the way through for unknown reason.
+
+%% 2017-3-16-18-13_1???????
+%% No notes from this date.
+
+2017-3-20-10-39_1
+Relatively easy run.
+This week, I'll be getting up at 730 (last week was 630).
+Today - porridge for breakfast, came straight in to the lab. Was using phone for short while (c. 15mins) before starting.
+A handful of times - low lum patches were too green, couldn't make red enough.
+
+2017-3-20-18-17_0
+Quite a lot of un-selectables, mainly - couldn't make it blue enough (/get rid of enough yellow)
+
+2017-3-21-10-23_0
+Woken by sunrise.
+Many unselectables (perhaps 10?)
+Was interrupted halfway through, added a chromatic signifier. Lights were on in room for roughly 10 seconds.
+Was interrupted again(!) almost at end, but only very breifly.
+
+2017-3-21-18-29_1
+Before: lunch at indian buffet, then 2 hours on matlab in basement.
+Interrupted by Lindsay and one other. No harm done.
+Many selections I wasn't entirely happy with - too yellow.
+
+2017-3-22-10-44_1
+Before: woke up at sunrise around 630, and struggled to get back to sleep (with bad dreams once asleep) until 730. Used phone until around 8, left 820. Walked 15 minutes to tube (Tot Hale), then underground to Euston. Walked from Angel to UCL, straight to basement.
+Nothing major to note re session.
+
+2017-3-22-18-42_0
+Before: Lunch in the refelctory, followed by half an hour in the basement writing on a laptop, a quick walk over to the SEAHA basement, 45 minutes meeting (talking face to face under fluorescents), then a walk to the TAP room (10th floor Torrington Pl, mix of artificial light and natural light, very bright due to height of building and uniterrupted sky view). Spent much of the session looking  at my phone. Then a 5 minute walk back to the lab (looking at phone for much of walk) and straight to the basement to begin.
+Feeling slightly weary throughout, with pain in chest developing near end.
+This session took much longer than other sessions, almost 2 hours. Probably the result of seeing the results from the previous experiment yesterday, and seeing that there was more variability in my data than others', and me wanting to get the best selections I could.
+I tried to count how many times there were patches that I couldn't make a confident selection with. It was between 12 and 15, mainly composed of the bottom 3 patches, though once a mid range one (about halfway through), and once the the very brightest patch (just before halfway through, I think?).
+
+2017-3-23-10-9_0
+Before: First night with sleep tracking app last night. Woke up at sunrise (Around 600) and slept fitfully after until alarm at 730. Read news on phone, had breakfast and set out for work around 820. Walked 15 minutes to train (with some looking at phone) and then caught underground to UCL. Did not read phone whilst on train. Visited bathroom, then came staight to basement and began.
+I am ill today - cough/headache/runny nose etc.
+Curiously, in this session there were no patches which I was not able to set to grey. There appears no obvious reason as to why this may be, other than perhaps my feeling unwell or the random draw of patches being remarkable good today.
+Listened to audiobook for first 2/3 of session. When this ended I carefully removed headphones. For the remainder of the session I was slightly worried that I might be running late for a teaching session at 11, though I consciously tried not to let this effect my results.
+
+2017-3-27-19-4_1
+Session which had been scheduled for 1700 on 3-23, but which did not place then due to onset on flue. Now 90% recovered, still with slight weakness and headache, but generally back to normal.
+Before: sunny day at home on the boat, doing laptop work inside (but surrounded by windows), sunny 15 minute walk to tube station, read on phone for 15 minute journey. Sun beginning to set during 5 minute walk to basement lab, but still good clear weather. 10 minutes or so setting up, changing light over etc. Clocks went forward last night, and this computer seems to have auto-updated.
+During: one reading (bottom rung about halfway through) was too green, but otherwise all selections seemed relatively easy, with the general increase in difficulty at low luminances.
+
+And with that - I call this done (for now?).
+Let's go analyse some data.
+
+
+
+
+
+
+
+
+
+
+
