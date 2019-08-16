@@ -1,0 +1,3 @@
+  5hz  65.41 218 86  | 24  142 169 240  10:00 Danny with mask
+  5hz  62.67 198 86  | 36  124 169 240  Immediate retrial of above
+  5hz  77.61 198 76  | 45  153 179 240  23/02 as 15/02

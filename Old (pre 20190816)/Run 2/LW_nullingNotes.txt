@@ -1,0 +1,18 @@
+LW notes
+start set at 22.5 on dial #1
+
+22.66
+dial #3 - right=pale peach, left = purple (maroon?)
+flashing light pale or white?
+
+dial #2 - flashing light more purple/bluey
+
+background - lavender/lilac (pale purply pinky
+red/blue flashing
+no discernable colour difference, just the flash.
+
+ LW:
+  val_0:22.66   val_1:204   val_2:91  val_b:11  val_u:164   val_a:91  val_r:46 //match on just movig dials #2/#3 with #1 set to ~DG (23)
+  val_0:34.63   val_1:205   val_2:98  val_b:17  val_u:157   val_a:98  val_r:70 //match just moving #1 after above
+  val_0:34.68   val_1:196   val_2:89  val_b:20  val_u:166   val_a:89  val_r:67 //match back on #2/#3
+  val_0:33.66   val_1:196   val_2:89  val_b:20  val_u:166   val_a:89  val_r:65 // final adjustment on #1

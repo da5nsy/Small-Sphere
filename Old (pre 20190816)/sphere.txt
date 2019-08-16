@@ -1,0 +1,22 @@
+  66.28  207 88  | 32  137 167 240 
+  75.66  197 93  | 44  149 162 240 
+  72.34  206 92  | 36  149 163 240 | (fairly precisely) 1619 14/02
+  60.31  197 59  | 35  118 196 240 | 2hz with black ring removed, 14/02
+  65.00  205 63  | 33  133 192 240 | 2hz with black ring removed, 14/02
+  60.31  221 75  | 21  133 180 240 | 20hz with black ring removed, 14/02
+  54.25  197 66  | 32  106 189 240 | 7hz with black ring removed, 14/02
+  -- made controls more precise--
+  -- range limited to:  50-80
+                        175-225
+                        50-100
+  15/02: black ring removed, in dark, without glasses, with ski-mask, with screen behind (showing white disk with square black fixation):
+  7hz  68.09 208 90  | 32  141 165 240  13:00
+  5hz  67.71 203 78  | 35  137 177 240  13:00 (78 should be 75?- loose connection)
+  5hz  71.85 201 81  | 39  144 174 240  14:30 (observation: felt stable at medium eccentricity, with minor sliight flicker at low ecc and medium flickr at high ecc)
+                                              cont. #2 knob could be made more sensitive (it quickly goes from strong red to strong blue)
+                                              whereas #3 could be made less sensitive (it barely seems to affect the appearance of the stimuli)
+                                              -- modified knob #1 to run between 50 and 90 (checking that I wan't limiting the luminance range)
+  5hz  77.68 204 81  | 40  158 174 240  15:30 Flicker still present, not entirely nulled, but best match possible.
+  5hz  58.37 206 98  | 29  120 157 240  16:45
+  5hz  77.14 197 88  | 45  151 167 240  17:40
+  5hz  77.14 202 87  | 41  155 168 240  17:40 Immediate re-do following lower than expected #2 on prev. Just re-set #2.
