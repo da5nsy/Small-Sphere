@@ -5,9 +5,10 @@ clear, clc, close all
 [cielambda,xbar,ybar,zbar]=loadCIE(1931);
 
 %% Plot LED chromaticities (3D)
-plot1931(3,xbar,ybar,zbar);
+%plot1931(3,xbar,ybar,zbar);
+figure, hold on
 
-load('C:\Users\ucesars\Dropbox\UCL\Ongoing Work\Small Sphere\led_xy.mat')
+load('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Hardware Specs\LEDs\led_xy.mat')
 plot3([U_xy(1),A_xy(1)],[U_xy(2),A_xy(2)],[0,0],'k')
 plot3([R_xy(1),B_xy(1)],[R_xy(2),B_xy(2)],[0,0],'k')
 
@@ -21,7 +22,7 @@ scatter3(U_xy(1),U_xy(2),0,'k','filled')
 text(U_xy(1)+.03,U_xy(2),0,'U')
 
 %Load screen calibration data
-load('C:\Users\ucesars\Dropbox\UCL\Data\Large Sphere\Large LCD display measurement - Oct 2016.mat')
+load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat')
 screen_xy=zeros(2,21,4);
 for i=1:21
     for j=1:4
@@ -65,7 +66,7 @@ for j=18-highL/5:18-lowL/5
     text(U_xy(1)+.03,U_xy(2),100,'U')
     
     %Load screen calibration data
-    load('C:\Users\ucesars\Dropbox\UCL\Data\Large Sphere\Large LCD display measurement - Oct 2016.mat')
+    load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Calibration Data\Large LCD display measurement - Oct 2016.mat')
     screen_xy=zeros(2,21,4);
     for k=1:21
         for l=1:4

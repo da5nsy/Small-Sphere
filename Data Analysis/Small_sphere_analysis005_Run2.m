@@ -7,8 +7,7 @@
 
 clc, clear, close all
 
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Small Sphere','Run 2 Data','Trial Data');
+rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
 cd(rootdir)
 files= dir('*.mat');
 
@@ -30,8 +29,7 @@ clear LABmatch RGBmatch RGBstart Tmatch j
 %% Creates calibrated LAB values
 
 %load CIE data
-ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
+ciefile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Old (pre 20190816)\LM files\CIE colorimetric data\CIE_colorimetric_tables.xls';
 ciedata= xlsread(ciefile,'1931 col observer','A6:D86');
 % figure, plot(ciedata(:,1),ciedata(:,2),...
 %     ciedata(:,1),ciedata(:,3),
