@@ -1,5 +1,5 @@
 # Small-Sphere
-Code for the small sphere
+Code and data for the small sphere
 
 Current status: 
 1. Pulling together all the random bits from all over my computer and putting them in one place.
