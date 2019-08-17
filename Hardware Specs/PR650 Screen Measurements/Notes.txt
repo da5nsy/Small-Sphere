@@ -1,0 +1,5 @@
+Data in 
+C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\PR650
+stored in files (multiple) called
+Large LCD display measurement.mat
+was recorded using PR650displaycharacterisation_DG.m
