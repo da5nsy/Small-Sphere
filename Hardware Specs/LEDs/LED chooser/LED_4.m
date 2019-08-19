@@ -1,12 +1,12 @@
-function output = LED_4_chooser(input)
+function output = LED_4(input)
 
 %clear all; clc
 
-%LEDs=[480,390,670];
-LEDs=input;
+LEDs=[480,400,670];
+%LEDs=input;
 
 % From CIE website: 'selected colorimetric tables' ('204')
-CIE1964=xlsread('C:\Users\ucesars\Dropbox\Documents\MATLAB\Selected Colorimetric Tables.xls',...
+CIE1964=xlsread('C:\Users\cege-user\Dropbox\Documents\MATLAB\Selected Colorimetric Tables.xls',...
     '1964 col observer','A6:D86');
 CIEwv=  CIE1964(:,1);
 x_bar10=        CIE1964(:,2);
@@ -15,7 +15,7 @@ z_bar10=        CIE1964(:,4);
 
 % From: Royer, M.P., 2011. Tuning optical radiation for visual and nonvisual impact (Ph.D.). The Pennsylvania State University, United States -- Pennsylvania.
 % Original source unclear
-load('C:\Users\ucesars\Dropbox\Documents\MATLAB\melanopsin.mat')
+load('C:\Users\cege-user\Dropbox\Documents\MATLAB\melanopsin.mat')
 mel_bar=i_bar; clear i_bar
 melwavelength=  mel_bar(:,1);
 mel_bar=        mel_bar(:,2);

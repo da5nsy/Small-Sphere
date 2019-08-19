@@ -5,7 +5,7 @@
 
 clc, clear, close all
 
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Ongoing Work','Small Sphere');
+rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Hardware Specs\Ocean Optics';
 cd(rootdir)
 
 try
@@ -24,8 +24,8 @@ end
 
 
 %% Dark field correction
-Data_HL_dfc      =   Data_HL_on(:,2)-Data_HL_off(:,2);
-Data_SPH_RB_dfc  =   Data_SPH_RB(:,2)-Data_SPH_off(:,2);
+Data_HL_dfc       =   Data_HL_on(:,2)-Data_HL_off(:,2);
+Data_SPH_RB_dfc   =   Data_SPH_RB(:,2)-Data_SPH_off(:,2);
 Data_SPH_UVA_dfc  =   Data_SPH_UVA(:,2)-Data_SPH_off(:,2);
 
 % figure, hold on, 
@@ -116,14 +116,22 @@ Data_LEDuv=zeros(size(Data_SPH_UVA_cor));
 Data_LEDuv(81:360)=Data_SPH_UVA_cor(81:360); %370:475nm
 
 figure, hold on, 
-plot(Data_HL_off(:,1),Data_LEDred/max(Data_LEDred));
-plot(Data_HL_off(:,1),Data_LEDblue/max(Data_LEDblue));
-plot(Data_HL_off(:,1),Data_LEDamber/max(Data_LEDamber));
-plot(Data_HL_off(:,1),Data_LEDuv/max(Data_LEDuv));
+plot(Data_HL_off(:,1),Data_LEDred/max(Data_LEDred),'r');
+plot(Data_HL_off(:,1),Data_LEDblue/max(Data_LEDblue),'b');
+plot(Data_HL_off(:,1),Data_LEDamber/max(Data_LEDamber),'y');
+plot(Data_HL_off(:,1),Data_LEDuv/max(Data_LEDuv),'Color',[0.5,0,0.5]);
+
+xlim([350 700])
+xlabel('Wavlength (nm)')
+ylim([0 1])
+yticks(ylim)
+ylabel('Normalised SPD')
+
+%save2pdf('LED_SPDs')
 %% Calculate chromaticity
 
 %load CIE data
-ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
+ciefile = fullfile('C:','Users','cege-user','Dropbox','UCL','Data',...
     'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
 ciedata= xlsread(ciefile,'1964 col observer','A6:D86');
 % figure, plot(ciedata(:,1),ciedata(:,2),...
@@ -157,17 +165,17 @@ UVA_xy(1)=UVA_XYZ(1)/sum(UVA_XYZ);
 UVA_xy(2)=UVA_XYZ(2)/sum(UVA_XYZ);
 
 figure, hold on
-plot(xbar./(xbar+ybar+zbar),ybar./(xbar+ybar+zbar))
+drawChromaticity('1931') % github.com/da5nsy/General
+
 scatter(RB_xy(1),RB_xy(2),'r')
 text(RB_xy(1),RB_xy(2),'RB')
 scatter(UVA_xy(1),UVA_xy(2),'b')
 text(UVA_xy(1),UVA_xy(2),'UVA')
-axis equal
 
 %% Calculate chromaticity of indvidual channels
 
 %load CIE data
-ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
+ciefile = fullfile('C:','Users','cege-user','Dropbox','UCL','Data',...
     'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
 ciedata= xlsread(ciefile,'1964 col observer','A6:D86');
 % figure, plot(ciedata(:,1),ciedata(:,2),...
@@ -213,10 +221,8 @@ U_XYZ(3)=zbar_int'*Data_LEDuv;
 U_xy(1)=U_XYZ(1)/sum(U_XYZ);
 U_xy(2)=U_XYZ(2)/sum(U_XYZ);
 
-
-
 figure, hold on
-plot(xbar./(xbar+ybar+zbar),ybar./(xbar+ybar+zbar))
+drawChromaticity('1931')
 
 plot([U_xy(1),A_xy(1)],[U_xy(2),A_xy(2)],'k')
 plot([R_xy(1),B_xy(1)],[R_xy(2),B_xy(2)],'k')
@@ -227,9 +233,9 @@ scatter(B_xy(1),B_xy(2),'b','filled')
 text(B_xy(1)+.03,B_xy(2),'B')
 scatter(A_xy(1),A_xy(2),'y','filled')
 text(A_xy(1)+.03,A_xy(2),'A')
-scatter(U_xy(1),U_xy(2),'k','filled')
+scatter(U_xy(1),U_xy(2),[],[0.5,0,0.5],'filled')
 text(U_xy(1)+.03,U_xy(2),'U')
 
-axis equal
-
 save led_xy.mat R_xy B_xy A_xy U_xy ;
+
+%save2pdf('LED_cross')

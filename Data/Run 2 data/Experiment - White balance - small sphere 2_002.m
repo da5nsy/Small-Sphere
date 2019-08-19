@@ -14,7 +14,7 @@
 ON = 1;  OFF = 0;
 TRUE = 1;  FALSE = 0;
 JOYSTICK = 0;
-PR=1;
+PR=1;   
 
 pause on;                   % enable pausing
 
@@ -132,11 +132,11 @@ RGBmatch = zeros(3,LN,N,'double');  % converted R,G,B values for match for each 
 RGBstart = zeros(3,LN,N,'double');  % RGB values for starting position before any slider modifications are made
 Tmatch   = zeros(3,LN,N,'double');  % time (H,M,S) for match
 
-for t = 1:N                         % repeat in time
+for t = 1:N                            % repeat in time
     fprintf(1,'\n--> Repetition count = %d\n',t);
     for n = 1:LN                       % repeat for each lightness level
         BUTTON_PRESSED = FALSE;        % reset state of push button
-        reset_colour=0;                  % reset value for storing first colour seen
+        reset_colour = 0;              % reset value for storing first colour seen
         azval = 0.5+rfac*(rand-0.5);   % randomise zero point on scale
         bzval = 0.5+rfac*(rand-0.5);
         % Get two slider settings and button status via Phidget controller
@@ -157,7 +157,7 @@ for t = 1:N                         % repeat in time
             if butval == ON
                 BUTTON_PRESSED = TRUE;
             else
-                L  = Lmat(t,n);                % lightness
+                L  = Lmat(t,n);                 % lightness
                 as = double(aval)/maxval;       % slider value inverted (0 at top)
                 bs = double(bval)/maxval;
                 az = as-azval;                  % A relative to current centre
@@ -183,7 +183,7 @@ for t = 1:N                         % repeat in time
                     bv = -bz*sub;
                 end
                 A = cfac*(au+bu);  B = cfac*(av+bv);   % sum components
-                A = A*(L/20);  B = B*(L/20);          % adjust for L level
+                A = A*(L/20);  B = B*(L/20);           % adjust for L level
                 [X Y Z] = LABtoXYZ(L,A,B,Xw,Yw,Zw);    % convert LAB to XYZ
                 [r g b gamutflag] = XYZtosRGBe(X/100,Y/100,Z/100); % convert to sRGB
                 
@@ -193,8 +193,8 @@ for t = 1:N                         % repeat in time
                     PRn = PRn+1;
                     PRXYZ = cgphotometer('XYZ');  % Take the measurement
                     PRspc = cgphotometer('SPC');  % Download the spectrum
-                    PRlambda(:) = PRspc(:,1);       % Save wavelength scale
-                    PRspd(:,PRn) = PRspc(:,2);        % Copy SPD to array
+                    PRlambda(:) = PRspc(:,1);     % Save wavelength scale
+                    PRspd(:,PRn) = PRspc(:,2);    % Copy SPD to array
                     
                     
                     fname = fullfile(cd,sprintf('Spectrum%03d.txt',PRn));

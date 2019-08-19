@@ -11,8 +11,8 @@ range = [490,600];   %Range over which a contender for LED_4 will be sought
 % From CIE website: 'selected colorimetric tables' ('204')
 %disp('Select CIE data location')
 
-%cie_data_file=uigetfile('C:\Users\ucesars\Dropbox\UCL\Data\Colour standards\CIE colorimetric data\CIE_colorimetric_tables.xls');
-cie_data_file=('C:\Users\ucesars\Dropbox\UCL\Data\Colour standards\CIE colorimetric data\CIE_colorimetric_tables.xls');
+%cie_data_file=uigetfile('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards\CIE colorimetric data\CIE_colorimetric_tables.xls');
+cie_data_file=('C:\Users\cege-user\Dropbox\UCL\Data\Colour standards\CIE colorimetric data\CIE_colorimetric_tables.xls');
 CIE1964=xlsread(cie_data_file,'1964 col observer','A6:D86');
 ciewavelength=  CIE1964(:,1);
 x_bar10=        CIE1964(:,2);
@@ -29,8 +29,8 @@ y=y_bar10./(x_bar10+y_bar10+z_bar10);
 % (Original source unclear)
 
 %disp('Select melanopsin data location')
-%mel_data_file=uigetfile('C:\Users\ucesars\Dropbox\Documents\MATLAB\melanopsin.mat');
-mel_data_file=('C:\Users\ucesars\Dropbox\Documents\MATLAB\melanopsin.mat');
+%mel_data_file=uigetfile('C:\Users\cege-user\Dropbox\Documents\MATLAB\melanopsin.mat');
+mel_data_file=('C:\Users\cege-user\Dropbox\Documents\MATLAB\melanopsin.mat');
 load(mel_data_file); mel_bar=i_bar; clear i_bar
 melwavelength=  mel_bar(:,1);
 mel_bar=        mel_bar(:,2);

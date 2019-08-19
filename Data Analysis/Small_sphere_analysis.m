@@ -148,7 +148,7 @@ for j=1:length(files)
 end
 
 
-%% Plot all data in LAB
+%% Plot data in LAB
 figure, hold on
 obs='DG';
 markerSize=25;
@@ -187,7 +187,9 @@ plot([0,0],[currentaxes.YLim],'Color',[.8,.8,.8]);
 %%
 %Short version
 %figure, hold on
-plotCIE(3,Xcmf,Ycmf,Zcmf)
+%plotCIE(3,Xcmf,Ycmf,Zcmf)
+figure, hold on
+drawChromaticity('1931','line')
 colSpace='xy';
 markerSize=20;
 view(3)
@@ -199,47 +201,39 @@ if strcmp(colSpace,'LAB')
             sprintf('%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
     end
 elseif strcmp(colSpace,'xy')
-    for i=[2,5]%[2,5,6,3,1,4]
+    for i=1:length(files)
         d=reshape(files(i).dataxy,2,150);
         d2=reshape(files(i).dataXYZ,3,150);
-        for i=1:150
-            s=scatter3(d(1,i),d(2,i),d2(2,i),markerSize,'filled','b');
-            if i==2
-                s.CData=[1,0,0];
-            end
-            %scatter3(d(1,i),d(2,i),d2(2,i),markerSize,'filled','DisplayName',...
-            %sprintf('%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
-            set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
-            
-            drawnow
-            pause(0.01)
-        end
+        scatter3(d(1,:),d(2,:),d2(2,:),markerSize,'filled','DisplayName',...
+            sprintf('%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
+        set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
     end
 end
 legend('show')
 %set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
 
 %% Plot all data in CIE 1931 xy
-obs='ALL';
-markerSize=[1:30];%25;
+obs='DG';
+markerSize=[1:30].^1.5;
 
 figure, hold on
 
 for i=1:length(files)
     for j=1:LN
         if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
-            %pause(1)
             if strcmp(files(i).name(end-5:end-4),'RB')
-                sc1= scatter3(   squeeze(files(i).dataxy(1,j,:)),...
+                sc1= scatter3(squeeze(files(i).dataxy(1,j,:)),...
                     squeeze(files(i).dataxy(2,j,:)),...
-                    squeeze(files(i).dataXYZ(2,j,:))...
-                    ,markerSize,[1,.1,.1],'filled');
+                    squeeze(files(i).dataXYZ(2,j,:)),...
+                    markerSize,[1,.1,.1],'filled',...
+                    'MarkerFaceAlpha',0.4);
                 
             elseif strcmp(files(i).name(end-5:end-4),'AU')
-                sc2= scatter3(   squeeze(files(i).dataxy(1,j,:)),...
+                sc2= scatter3(squeeze(files(i).dataxy(1,j,:)),...
                     squeeze(files(i).dataxy(2,j,:)),...
-                    squeeze(files(i).dataXYZ(2,j,:))...
-                    ,markerSize,[0,.8,0],'filled');
+                    squeeze(files(i).dataXYZ(2,j,:)),...
+                    markerSize,[0,.8,0],'filled',...
+                    'MarkerFaceAlpha',0.4);
             end
         end
     end
