@@ -1,7 +1,10 @@
-names={'20170720 DG_RB';'20170720 HC_RB';'20170720 LW_AU';'20170721 DG_AU';'20170721 HC_AU';'20170721 LW_RB'};
+clear, clc, close all
 
+d = dir('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics\201*');
+names = {d.name}';
+
+%%
 for i=1:6
+    disp(names{i})
     OO_smallSphere_002(names{i})
-    title(names{i})
-    drawnow
 end

@@ -1,4 +1,4 @@
-function SPDmean=OO_smallSphere_002(obs)
+function [SPDmean,xyY] = OO_smallSphere_002(obs)
 %Handles data collected with the Ocean Optics USB 2000+ during small sphere
 %experiments, measuring the interior chromaticity of the sphere at 5 second
 %intervals
@@ -11,12 +11,12 @@ function SPDmean=OO_smallSphere_002(obs)
 %Plots xy
 
 %% Read data
-%obs='20170720 LW_AU';
+%clear, clc, close all
+%obs = '20170720 HC_RB'; 
 %uncomment the above when using as a script rather than a function
 
 % Set Input Folder
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Small Sphere','Run 2 Data','Ocean Optics',obs);
+rootdir = fullfile('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics\',obs);
 cd(rootdir)
 
 try
@@ -47,8 +47,7 @@ catch
     save(obs)
 end
 
-load(fullfile('C:','Users','ucesars','Dropbox','UCL','Ongoing Work',...
-    'Small Sphere','correction vector.mat'));
+load('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Hardware Specs\Ocean Optics\correction vector.mat');
 
 % %% Plot time course of recording, to select dfc and measurement goalposts
 % %Would be nice to plot against time, but this seems tricky
@@ -86,29 +85,63 @@ wavelength = LEDrad(:,1,1);
 % The following plots the spectra of the first reading, and then
 % successively plots the rest of the data (in between startP and endP) to
 % allow for comparison over time.
+%
+% Same goes for chromaticity except all the chromaticities are shown.
 
-% figure('units','normalized','outerposition',[0 0 1 1]);  hold on;
-% grid on
-% grid minor
-% for k = startP:endP%1:length(txtfls)
-%     pause(0.01)
-%     cla
-%     m = max(LEDrad(:,2,k));
-%     
-%     %Plot calibrated data (it gets noisy in the extremes)
-%     plot(wavelength(107:1231),(LEDrad(107:1231,2,startP)-dfc(107:1231)).*correction_vector(107:1231),'b');
-%     plot(wavelength(107:1231),(LEDrad(107:1231,2,k)-dfc(107:1231)).*correction_vector(107:1231),'k');
-%     
-%     %Plot uncalibrated data
-% %     plot(wavelength,LEDrad(:,2,startP)-dfc,'b');
-% %     plot(wavelength,LEDrad(:,2,k)-dfc,'k');
-%     t=title(txtfls(k).name);
-%     
-%     xlabel('Wavelength (nm)');
-%     ylabel('Ocean Optics DFC Data');
-%     %axis([380,780,0,1]);
-%     set(t,'Interpreter','none'); %needs named figure -'t'
-% end
+load T_xyz1931.mat T_xyz1931 S_xyz1931
+
+wlSi = 107;  %wavelength start
+wlEi = 1231; %wavelength end
+
+%Interpolates CIEdata to fit OO wavelength intervals
+% T_xyz1931 = SplineCmf(S_xyz1931,T_xyz1931,wavelength(wlSi:wlEi)); %can't do this  because PTB needs evenly spaced samples
+T_xyz1931 = interp1(SToWls(S_xyz1931),T_xyz1931',wavelength(wlSi:wlEi),'spline'); % roughly 380:780
+
+SPD = squeeze((LEDrad(wlSi:wlEi,2,:)-dfc(wlSi:wlEi)).*correction_vector(wlSi:wlEi));
+
+XYZ = SPD'*T_xyz1931;
+xyY = XYZToxyY(XYZ');
+
+plt_SPDs = 1;
+
+if plt_SPDs        
+    figure('units','normalized','outerposition',[0 0 1 1]);  hold on;
+
+    s(1) = subplot(1,2,1);
+    hold on
+    grid on
+    grid minor
+    xlabel('Wavelength (nm)');
+    ylabel('Ocean Optics DFC Data');
+    ylim([0 1])
+    %axis([380,780,0,1]);
+    
+    plot(s(1),wavelength(wlSi:wlEi),SPD(:,startP),'k') % first measurement as reference
+    
+    s(2) = subplot(1,2,2);
+    hold on
+    axis equal    
+    xlabel('x')
+    ylabel('y')
+
+    for k = startP:endP%1:length(txtfls)         
+        title(s(1),[obs,' ', txtfls(k).name(end-15:end-8)],'Interpreter','none');
+        
+        %Plot calibrated data (it gets noisy in the extremes)
+        %plot(wavelength(wlSi:wlEi),(LEDrad(wlSi:wlEi,2,k)-dfc(wlSi:wlEi)).*correction_vector(wlSi:wlEi),'k');  
+        cla(s(1))
+        plot(s(1),wavelength(wlSi:wlEi),SPD(:,startP),'k')
+        plot(s(1),wavelength(wlSi:wlEi),SPD(:,k),'b')
+        
+        %Plot uncalibrated data
+        %     plot(wavelength,LEDrad(:,2,startP)-dfc,'b');
+        %     plot(wavelength,LEDrad(:,2,k)-dfc,'k');
+        
+        scatter(s(2),xyY(1,k),xyY(2,k),'k.');
+        drawnow
+
+    end
+end
 % 
 % %Notes
 % 
@@ -132,36 +165,12 @@ wavelength = LEDrad(:,1,1);
 % %U increases slightly, and shifts slightly higher
 
 %%
-%Loads CIE data if not already stored as variables
-%if exist('xbar','var')~=1;[cielambda,xbar,ybar,zbar]=loadCIE(1931);end
-%Creates initial plot
-%plotCIE(2,xbar,ybar,zbar);
-
-%Interpolates CIEdata to fit OO wavelength intervals
-% xbar_int=interp1(cielambda,xbar,wavelength(107:1231),'spline'); %380:780
-% ybar_int=interp1(cielambda,ybar,wavelength(107:1231),'spline'); 
-% zbar_int=interp1(cielambda,zbar,wavelength(107:1231),'spline'); 
-
-%Calculates XYZ and xy for all points
-for i = startP:endP
-    
-    SPD(:,i) =(LEDrad(107:1231,2,i)-dfc(107:1231)).*correction_vector(107:1231);
-    
-%     XYZ(:,i) =[((LEDrad(107:1231,2,i)-dfc(107:1231)).*correction_vector(107:1231))'*xbar_int;
-%         ((LEDrad(107:1231,2,i)-dfc(107:1231)).*correction_vector(107:1231))'*ybar_int;
-%         ((LEDrad(107:1231,2,i)-dfc(107:1231)).*correction_vector(107:1231))'*zbar_int;];
-%     
-%     xy(:,i)=[XYZ(1,i)/sum(XYZ(:,i));XYZ(2,i)/sum(XYZ(:,i))];
-%     scatter(xy(1,i),xy(2,i),'k.');
-end
-
-%%
 % figure, hold on
 % for i=startP:endP
 %     plot(SPD(:,i),'k')
 % end
 % figure
-SPDmean=mean(SPD(:,startP:endP),2);
+SPDmean = mean(SPD(:,startP:endP),2);
 
 end
 
