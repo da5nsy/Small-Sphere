@@ -11,8 +11,8 @@ function [SPDav,xyY,startP,endP] = OO_smallSphere_002(obs)
 %Plots xy
 
 %% Read data
-clear, clc, close all
-obs = '20171019 HC_RB'; 
+%clear, clc, close all
+%obs = '20171019 HC_RB'; 
 %uncomment the above when using as a script rather than a function
 
 % Set Input Folder
@@ -129,7 +129,7 @@ end
 XYZ = SPD'*T_xyz1931;
 xyY = XYZToxyY(XYZ');
 
-plt_SPDs = 1;
+plt_SPDs = 0;
 
 if plt_SPDs        
     figure('units','normalized','outerposition',[0 0 1 1]);  hold on;
@@ -199,10 +199,10 @@ end
 % end
 % figure
 wl = wavelength(wlSi:wlEi);
-SPDshort = SPD(:,startP:endP);
+%SPDshort = SPD(:,startP:endP);
 SPDav = median(SPD(:,startP:endP),2);
 
-save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data',obs,'summary.mat'],'wl','SPDshort','SPDav','xyY')
+save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics Summary\',obs,'summary.mat'],'wl','SPDav','xyY')
 
 end
 
