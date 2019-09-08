@@ -16,12 +16,11 @@ function SmallSphereCalibrationCheck(obs,d)
 % Convert to tristimulus values
 % Compare the above
 
-%clc, clear, %close all
-%obs='Characterization without LEDs'; 
+clc, clear, %close all
+obs = 'Characterization without LEDs'; 
 
 %% Load CIE data
-ciefile = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Colour Standards','CIE colorimetric data','CIE_colorimetric_tables.xls');
+ciefile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Old (pre 20190816)\LM files\CIE colorimetric data\CIE_colorimetric_tables.xls';
 
 ciedata2= xlsread(ciefile,'1931 col observer','A6:D86');
 lambdaCie2=ciedata2(:,1);
@@ -41,8 +40,7 @@ zbar2_101=interp1(lambdaCie2,zbar2,380:4:780,'spline');
 
 %% Load fake APS data
 
-rootdir = fullfile('C:','Users','ucesars','Dropbox','UCL','Data',...
-    'Small Sphere','Run 2 Data','PR650',obs);
+rootdir = fullfile('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\PR650',obs);
 cd(rootdir)
 files= dir('2017*.mat');
 
@@ -192,9 +190,13 @@ end
 
 %% Compare XYZ
 
+d = 2;
+
 if d==3
     
-    %figure, hold on;
+    %plotCIE(3,xbar2,ybar2,zbar2)
+    figure,
+    hold on;
     
     XYZr=reshape(files.dataXYZ,3,15);
     xyr=reshape(files.dataxy,2,15);
@@ -207,12 +209,14 @@ if d==3
         scatter3(PR650(i).dataxy(1),PR650(i).dataxy(2),PR650(i).dataXYZ(2),'b*')
     end
     
+    %daspect([1 1 10])
+    
     %title(obs);
     
     % Compare xy
 elseif d==2
-    %plotCIE(2,xbar2,ybar2,zbar2)
-    %hold on
+    plotCIE(2,xbar2,ybar2,zbar2)
+    hold on
     
     xyr=reshape(files.dataxy,2,15);
     
@@ -229,4 +233,4 @@ elseif d==2
     %title(obs);
 end
 
-legend([h1 h2])
+%legend([h1 h2])

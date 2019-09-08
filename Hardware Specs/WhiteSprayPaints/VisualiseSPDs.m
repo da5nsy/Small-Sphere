@@ -5,6 +5,8 @@
 
 clear, clc, close all
 
+DGdisplaydefaults
+
 %% Pre run commands:
 
 rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Hardware Specs\WhiteSprayPaints';
@@ -94,11 +96,11 @@ reflectance=zeros(size(dataDFC));
 col={[0,.1,.9],[1,.9,.3],[.7,.9,.2],[.8,.8,.9],...
     [.4,.5,.5],[.1,.7,.5],[.7,0,0],[0,.5,.9],[0,0,0]};
 
-% figure, hold on
-% for i=1:size(data,2)
-%     reflectance(:,i,1)=dataDFC(:,i,1)./mbcc;
-%     plot(lambda,reflectance(:,i,1),'Color',col{ceil(i/3)})
-% end
+figure, hold on
+for i=1:size(data,2)
+    reflectance(:,i,1)=dataDFC(:,i,1)./mbcc;
+    plot(lambda,reflectance(:,i,1),'Color',col{ceil(i/3)})
+end
 
 figure('Position',[100 100 500 800]),
 hold on

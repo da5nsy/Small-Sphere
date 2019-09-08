@@ -15,15 +15,7 @@ function stats = Small_sphere_analysis(obs)
 
 % Display Settings
 plt.disp = 1;         % Display figures?
-d.s=25;               % display, size
-d.MFA = 0.2;          % Marker Face Alpha
-d.mktrns = 0.3;       % Marker transparency
-set(groot,'defaultfigureposition',[100 100 500 400])
-set(groot,'defaultLineLineWidth',2)
-set(groot,'defaultAxesFontName', 'Courier')
-set(groot,'defaultAxesFontSize',12)
-set(groot,'defaultFigureRenderer', 'painters') %renders pdfs as vector graphics
-set(groot,'defaultfigurecolor','white')
+d = DGdisplaydefaults;
 set(groot,'defaultAxesColorOrder',hsv(10))
 
 rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
