@@ -180,10 +180,36 @@ axis equal
 legend('Location','best')
 
 
-%%
+%% Add Ocean Optics LED values
 
+r = OOLED;
 
+ds = 30; %downsample. You don't need all the chromaticities.
 
+figure, hold on
+drawChromaticity('1931')
+for i = 1:length(r)
+    scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
+        'filled','MarkerEdgeAlpha',0.1,'MarkerFaceAlpha',0.1,...
+        'DisplayName',r(i).name)
+end
+daspect([1,1,50])
+
+legend('Interpreter','None')
+
+%% Add gamut
+% Note that this is just for the last loaded characterization
+
+screen_xy = zeros(2,21,4);
+for i=1:21
+    for j=1:4
+        screen_xy(1,i,j) = XYZ(1,i,j)./sum(XYZ(:,i,j));
+        screen_xy(2,i,j) = XYZ(2,i,j)./sum(XYZ(:,i,j));
+    end
+    plot3(squeeze(screen_xy(1,i,[1,2,3,1])),...
+        squeeze(screen_xy(2,i,[1,2,3,1])),...
+        squeeze(XYZ(2,i,[1,2,3,1])),'k:');
+end
 
 
 
