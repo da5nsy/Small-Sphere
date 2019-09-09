@@ -11,11 +11,12 @@ function stats = Small_sphere_analysis(obs)
 % Put into pretty subplot with different angles of view
 
 %% Pre-flight
-%clc, clear, close all
+clc, clear, close all
+obs = 'DG';
 
 % Display Settings
-plt.disp = 1;         % Display figures?
-d = DGdisplaydefaults;
+%plt.disp = 1;         % Display figures?
+DGdisplaydefaults;
 set(groot,'defaultAxesColorOrder',hsv(10))
 
 rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
@@ -131,7 +132,7 @@ end
 %%
 
 figure, hold on
-colSpace = 'xy';
+colSpace = 'LAB';
 markerSize = 20;
 
 if strcmp(colSpace,'LAB')
@@ -146,6 +147,7 @@ if strcmp(colSpace,'LAB')
     xlabel('a*')
     ylabel('b*')
     zlabel('L*')
+    axis equal
 elseif strcmp(colSpace,'xy')
     %drawChromaticity('1931','line')
     for i = 1:length(files)        
@@ -164,7 +166,7 @@ elseif strcmp(colSpace,'xy')
 end
 legend('Location','best')
 
-save2pdf(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data Analysis\figs\',obs])
+%save2pdf(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data Analysis\figs\',obs])
 
 
 %% Plot all data in CIE 1931 xy, showing time as marker size
