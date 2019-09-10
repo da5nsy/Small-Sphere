@@ -202,7 +202,12 @@ wl = wavelength(wlSi:wlEi);
 %SPDshort = SPD(:,startP:endP);
 SPDav = median(SPD(:,startP:endP),2);
 
-save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics Summary\',obs,'summary.mat'],'wl','SPDav','xyY')
+% I'm turning off automatic save for this because it seems to create new
+% versions each time I run it even though nothing changes. Best guess - a
+% new timestamp makes git think that something has changed (!?). Would be
+% unusual but that's all I can figure.
+
+%save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics Summary\',obs,'summary.mat'],'wl','SPDav','xyY')
 
 end
 
