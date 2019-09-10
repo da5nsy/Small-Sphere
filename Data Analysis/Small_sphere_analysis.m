@@ -16,7 +16,7 @@ set(groot,'defaultAxesColorOrder',hsv(10))
 
 rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
 
-N = 30;                             % number of repetitions over time
+N  = 30;                             % number of repetitions over time
 LN = 5;                             % number of lightness levels per repeat
 
 %% Loads data
@@ -213,8 +213,6 @@ end
 daspect([1,1,500]) %Neat to see in 3D
 legend off
 %save2pdf('OOwide')
-
-%%
 
 xlim([0.3775, 0.5161])
 ylim([0.1764, 0.3151])
