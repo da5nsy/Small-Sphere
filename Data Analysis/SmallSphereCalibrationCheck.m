@@ -1,4 +1,4 @@
-function SmallSphereCalibrationCheck(obs,d)
+function SmallSphereCalibrationCheck(obs)
 %% Check calibration of small sphere APS (achromatic point setting) data
 % 
 % I have recorded values from the PR650, and from within matlab.
@@ -16,8 +16,10 @@ function SmallSphereCalibrationCheck(obs,d)
 % Convert to tristimulus values
 % Compare the above
 
-clc, clear, close all
-obs = 'Characterization without LEDs'; 
+%%
+
+%clc, clear, close all
+%obs = 'Characterization without LEDs'; 
 
 rootdir = fullfile('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\PR650',obs);
 
@@ -139,7 +141,7 @@ scatter3(PR650_xyr(1,2:15),PR650_xyr(2,2:15),PR650_xyr(3,2:15),'b*','DisplayName
 %     end
 
 %daspect([1 1 10])
-%title(obs);
+title(obs,'Interpreter','none');
 legend
 
 
