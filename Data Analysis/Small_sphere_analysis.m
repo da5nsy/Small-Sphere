@@ -32,6 +32,8 @@ for j = 1:length(files)
 end
 clear LABmatch RGBmatch RGBstart Tmatch j
 
+files = rmfield(files,{'bytes','isdir','datenum'}); %remove unused fields
+
 %% Creates calibrated LAB values
 
 for trial=1:length(files)
@@ -55,9 +57,16 @@ for trial=1:length(files)
     %   the recorded spectra, but this method is much neater and in-ilne with
     %   the use of the PR650 XYZ values elsewhere).
     
-    files(trial).screenXYZ  = XYZ;     
+    files(trial).screenXYZ  = XYZ;
+    for i = 1:21
+        for j = 1:4
+            files(trial).screenxyY(:,i,j)  = XYZToxyY(squeeze(XYZ(:,i,j)));
+        end
+    end
+    
     files(trial).screenXYZw = XYZ(:,end,4)/XYZ(2,end,4)*100;
-    files(trial).screenxyw  = [XYZ(1,end,4)/sum(XYZ(:,end,4));XYZ(2,end,4)/sum(XYZ(:,end,4))];
+    files(trial).screenxyw  = files(trial).screenxyY(:,end,end);
+    
     
     % Thresholding:
     %   Original RGB values included out of gamut (sRGB)
@@ -216,19 +225,36 @@ end
 %save2pdf('OO')
 
 %% Add gamut
-% Note that this is just for the last loaded characterization
 
-figure, hold on
-screen_xy = zeros(2,21,4);
-for i=21%1:21
-    for j=1:4
-        screen_xy(1,i,j) = XYZ(1,i,j)./sum(XYZ(:,i,j));
-        screen_xy(2,i,j) = XYZ(2,i,j)./sum(XYZ(:,i,j));
+%figure, hold on
+%drawChromaticity
+daspect([1,1,100])
+for j = 1:length(files)
+    for i = 1:3:size(files(j).screenxyY,2)        
+        plot3(squeeze(files(j).screenxyY(1,i,[1,2,3,1])),...
+            squeeze(files(j).screenxyY(2,i,[1,2,3,1])),...
+            squeeze(files(j).screenxyY(3,i,[1,2,3,1])));
+        
     end
-    plot3(squeeze(screen_xy(1,i,[1,2,3,1])),...
-        squeeze(screen_xy(2,i,[1,2,3,1])),...
-        squeeze(XYZ(2,i,[1,2,3,1])),'k:');
+    ax = gca;
+    ax.ColorOrderIndex = 1;
 end
+
+% make it one colour per file
+
+
+% % Note that this is just for the last loaded characterization
+% figure, hold on
+% screen_xy = zeros(2,21,4);
+% for i=21%1:21
+%     for j=1:4
+%         screen_xy(1,i,j) = XYZ(1,i,j)./sum(XYZ(:,i,j));
+%         screen_xy(2,i,j) = XYZ(2,i,j)./sum(XYZ(:,i,j));
+%     end
+%     plot3(squeeze(screen_xy(1,i,[1,2,3,1])),...
+%         squeeze(screen_xy(2,i,[1,2,3,1])),...
+%         squeeze(XYZ(2,i,[1,2,3,1])),'k:');
+% end
 
 
 
