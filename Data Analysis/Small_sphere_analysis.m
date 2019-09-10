@@ -5,11 +5,6 @@ function stats = Small_sphere_analysis(obs)
 % Calibrates data
 % Computes XYZ, xy and CIELAB
 
-% TO DO
-
-% Compare with LED measurements
-% Put into pretty subplot with different angles of view
-
 %% Pre-flight
 clc, clear, close all
 obs = 'ALL';
@@ -60,7 +55,9 @@ for trial=1:length(files)
     %   the recorded spectra, but this method is much neater and in-ilne with
     %   the use of the PR650 XYZ values elsewhere).
     
-    XYZw(:,trial) = XYZ(:,end,4)/XYZ(2,end,4)*100;
+    files(trial).screenXYZ  = XYZ;     
+    files(trial).screenXYZw = XYZ(:,end,4)/XYZ(2,end,4)*100;
+    files(trial).screenxyw  = [XYZ(1,end,4)/sum(XYZ(:,end,4));XYZ(2,end,4)/sum(XYZ(:,end,4))];
     
     % Thresholding:
     %   Original RGB values included out of gamut (sRGB)
@@ -95,17 +92,19 @@ for trial=1:length(files)
             files(trial).dataxycal(3,j,k) = files(trial).dataXYZcal(2,j,k);
             
             files(trial).dataLABcal(:,j,k) = ...
-                XYZToLab(files(trial).dataXYZcal(:,j,k),XYZw(:,trial));
+                XYZToLab(files(trial).dataXYZcal(:,j,k),files(trial).screenXYZw);
         end
     end
 end
 
 % % Plot display white points
 
-xyw = [XYZw(1,:)./sum(XYZw);XYZw(2,:)./sum(XYZw)];
+
 figure, hold on
 drawChromaticity('1931')
-scatter(xyw(1,:),xyw(1,:),'k')
+for trial = 1:length(files)
+    scatter(files(trial).screenxyw(1),files(trial).screenxyw(2),'k')
+end
 
 %%
 
@@ -182,26 +181,46 @@ legend('Location','best')
 
 %% Add Ocean Optics LED values
 
-r = OOLED;
+if ~exist('r','var') % just for debuggling when I'm running this chunk many times over
+    r = OOLED;
+end
 
 ds = 30; %downsample. You don't need all the chromaticities.
 
-figure, hold on
-drawChromaticity('1931')
+%figure, hold on
+%drawChromaticity('1931')
 for i = 1:length(r)
-    scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
+    b = scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
         'filled','MarkerEdgeAlpha',0.1,'MarkerFaceAlpha',0.1,...
-        'DisplayName',r(i).name)
+        'DisplayName',r(i).name,'HandleVisibility','off');
+    if contains(r(i).name,'AU') % If the condition is 1, make it blue
+        b.MarkerFaceColor = 'b';
+    elseif contains(r(i).name,'RB')
+        b.MarkerFaceColor = 'r';
+    else
+        disp('Something gone wrong')
+    end
 end
-daspect([1,1,50])
+daspect([1,1,500]) %Neat to see in 3D
+legend off
+%save2pdf('OOwide')
 
-legend('Interpreter','None')
+%%
+
+xlim([0.3775, 0.5161])
+ylim([0.1764, 0.3151])
+for i = 1:length(r)
+text(r(i).xyY(1,r(i).endP),r(i).xyY(2,r(i).endP),r(i).name,'Interpreter','None'); 
+end
+% (Then fiddle around manually with labels so that they don't overlap)
+%save2pdf('OO')
 
 %% Add gamut
 % Note that this is just for the last loaded characterization
 
+figure, hold on
 screen_xy = zeros(2,21,4);
-for i=1:21
+for i=21%1:21
     for j=1:4
         screen_xy(1,i,j) = XYZ(1,i,j)./sum(XYZ(:,i,j));
         screen_xy(2,i,j) = XYZ(2,i,j)./sum(XYZ(:,i,j));
