@@ -15,6 +15,7 @@ DGdisplaydefaults;
 set(groot,'defaultAxesColorOrder',hsv(10))
 
 rootdir = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Trial Data';
+figfile = 'C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data Analysis\figs\';
 
 N  = 30;                             % number of repetitions over time
 LN = 5;                             % number of lightness levels per repeat
@@ -116,77 +117,125 @@ for trial = 1:length(files)
 end
 
 %%
+if strcmp(obs,'ALL')
+    figure, hold on
+else
+    figure('Position',[100 100 500 600]), hold on
+end
 
-figure, hold on
 colSpace = 'LAB';
 markerSize = 20;
 
 if strcmp(colSpace,'LAB')
     for i = 1:length(files)
         if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
-            scatter3(files(i).dataLABcal(2,:),files(i).dataLABcal(3,:),files(i).dataLABcal(1,:),markerSize,'filled',...
-                'DisplayName',sprintf('%s-%s-%s',files(i).name(6:10),files(i).name(end-8:end-7),files(i).name(end-5:end-4)),...
-                'MarkerFaceAlpha',0.4);
+            if strcmp(obs,'ALL')
+                a = scatter3(files(i).dataLABcal(2,:),files(i).dataLABcal(3,:),files(i).dataLABcal(1,:),markerSize,'filled',...
+                    'DisplayName',sprintf('%s-%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4),files(i).name(6:10)),...
+                    'MarkerFaceAlpha',0.4);
+                xlabel('a*')
+                ylabel('b*')
+                zlabel('L*')
+            end
+            if ~strcmp(obs,'ALL')
+                for j = 1:3 %subplots
+                    subplot(3,1,j); hold on
+                    if strcmp(files(i).name(end-8:end-7),obs)
+                        a = scatter3(files(i).dataLABcal(2,:),files(i).dataLABcal(3,:),files(i).dataLABcal(1,:),markerSize,'filled',...
+                            'DisplayName',sprintf('%s-%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4),files(i).name(6:10)),...
+                            'MarkerFaceAlpha',0.4);
+                        view(2)
+                    end
+                    if contains(files(i).name,'AU') % If the condition is 1, make it blue
+                        a.MarkerFaceColor = 'b';
+                    elseif contains(files(i).name,'RB')
+                        a.MarkerFaceColor = 'r';
+                    else
+                        disp('Something gone wrong')
+                    end
+                    if contains(files(i).name,'2017-10') % If it's a repeat, make it darker
+                        a.MarkerFaceColor = (a.MarkerFaceColor/1.5)+[0,0.5,0];
+                    end
+                    if j == 1
+                        view(2)
+                        axis equal
+                        xlim([-50 200])
+                        legend('Location','best')
+                    elseif j == 2
+                        view(0,0)
+                        daspect([1,1,3])
+                    elseif j == 3
+                        view(-90,0)
+                        daspect([1,1,3])
+                    end
+                    xlabel('a*')
+                    ylabel('b*')
+                    zlabel('L*')
+                end
+            end
         end
     end
-    set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
-    xlabel('a*')
-    ylabel('b*')
-    zlabel('L*')
-    axis equal
 elseif strcmp(colSpace,'xy')
     %drawChromaticity('1931','line')
     for i = 1:length(files)
         if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
-            scatter3(files(i).dataxy(1,:),files(i).dataxy(2,:),files(i).dataXYZ(2,:),markerSize,'filled',...
+            scatter3(files(i).dataxycal(1,:),files(i).dataxycal(2,:),files(i).dataXYZcal(2,:),markerSize,'filled',...
                 'DisplayName',sprintf('%s-%s-%s',files(i).name(6:10),files(i).name(end-8:end-7),files(i).name(end-5:end-4)),...
                 'MarkerFaceAlpha',0.4);
         end
     end
-    daspect([1,1,1000])
-    curfig = gcf;
-    pbaspect([curfig.OuterPosition(1),curfig.OuterPosition(2)*0.8,curfig.OuterPosition(2)*0.8]) %outer position isn't quite what I want here, so I'm just scaling it up manually for now
+    axis equal
+    % % The below (to get good plotting in 3D is a bit weird currently, needs fiddling with, sure I shouldn't have to call pbaspect
+    %daspect([1,1,1000])
+    %curfig = gcf;
+    %pbaspect([curfig.OuterPosition(1),curfig.OuterPosition(2)*0.8,curfig.OuterPosition(2)*0.8]) %outer position isn't quite what I want here, so I'm just scaling it up manually for now
     xlabel('x')
     ylabel('y')
     zlabel('Y')
 end
-legend('Location','best')
+%legend('Location','best')
 
-%save2pdf(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data Analysis\figs\',obs])
+save2pdf([figfile,obs])
 
 %% Plot ellipses to summarise all data
 
-figure, hold on
-drawChromaticity
+figure('Position',[100 100 500 600]), hold on
+%drawChromaticity
 for i = [9,6,8,3,5,4,10,2,7,1]
-    %data(:,:,:,i) = files(i).dataLABcal;
-    data(:,:,:,i) = files(i).dataxycal;
-    %dfe = squeeze(data(2:3,:,:,i)); %data for ellipse (LAB)
-    dfe = squeeze(data(1:2,:,:,i)); %data for ellipse (xy)
-    dfe = dfe(:,:);
-    
-    e = plotEllipse(dfe,0);
-    a = plot(e(1,:), e(2,:),...
-        'DisplayName',sprintf('%s-%s-%s',files(i).name(6:10),files(i).name(end-8:end-7),files(i).name(end-5:end-4)));
-    if contains(files(i).name,'AU') % If the condition is 1, make it blue
-        a.Color = 'b';
-    elseif contains(files(i).name,'RB')
-        a.Color = 'r';
-    else
-        disp('Something gone wrong')
-    end
-    if contains(files(i).name,'2017-10') % If it's a repeat, make it darker
-        a.Color = a.Color/2;
-    end
-    if contains(files(i).name,'HC')
-        a.LineStyle = ':';
-    elseif contains(files(i).name,'LW')
-        a.LineStyle = '--';
+    if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
+        data(:,:,:,i) = files(i).dataLABcal;
+        %data(:,:,:,i) = files(i).dataxycal;
+        dfe = squeeze(data(2:3,:,:,i)); %data for ellipse (LAB)
+        %dfe = squeeze(data(1:2,:,:,i)); %data for ellipse (xy)
+        dfe = dfe(:,:);
+        
+        e = plotEllipse(dfe,0);
+        a = plot(e(1,:), e(2,:),...
+            'DisplayName',sprintf('%s-%s-%s',files(i).name(end-8:end-7),files(i).name(end-5:end-4),files(i).name(6:10)));
+        if contains(files(i).name,'AU') % If the condition is 1, make it blue
+            a.Color = 'b';
+        elseif contains(files(i).name,'RB')
+            a.Color = 'r';
+        else
+            disp('Something gone wrong')
+        end
+        if contains(files(i).name,'2017-10') % If it's a repeat, make it darker
+            a.Color = (a.Color/2);
+        end
+        if contains(files(i).name,'HC')
+            a.LineStyle = ':';
+        elseif contains(files(i).name,'LW')
+            a.LineStyle = '--';
+        end
     end
 end
 axis equal
-legend('Location','best')
+xlim([-20,67])
+ylim([-55,55])
 
+legend('Location','southeast')
+
+save2pdf([figfile,'SSsummary.pdf'])
 
 %% Add Ocean Optics LED values
 
@@ -196,8 +245,8 @@ end
 
 ds = 30; %downsample. You don't need all the chromaticities.
 
-%figure, hold on
-%drawChromaticity('1931')
+figure, hold on
+drawChromaticity('1931')
 for i = 1:length(r)
     b = scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
         'filled','MarkerEdgeAlpha',0.1,'MarkerFaceAlpha',0.1,...
@@ -217,7 +266,7 @@ legend off
 xlim([0.3775, 0.5161])
 ylim([0.1764, 0.3151])
 for i = 1:length(r)
-text(r(i).xyY(1,r(i).endP),r(i).xyY(2,r(i).endP),r(i).name,'Interpreter','None'); 
+    text(r(i).xyY(1,r(i).endP),r(i).xyY(2,r(i).endP),r(i).name,'Interpreter','None');
 end
 % (Then fiddle around manually with labels so that they don't overlap)
 %save2pdf('OO')
@@ -228,7 +277,7 @@ end
 %drawChromaticity
 daspect([1,1,100])
 for j = 1:length(files)
-    for i = 1:3:size(files(j).screenxyY,2)        
+    for i = 1:3:size(files(j).screenxyY,2)
         plot3(squeeze(files(j).screenxyY(1,i,[1,2,3,1])),...
             squeeze(files(j).screenxyY(2,i,[1,2,3,1])),...
             squeeze(files(j).screenxyY(3,i,[1,2,3,1])));
