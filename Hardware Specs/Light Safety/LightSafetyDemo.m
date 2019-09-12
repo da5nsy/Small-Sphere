@@ -56,8 +56,12 @@ S = [380 1 401];
 % clear spd_lightsafetyexample S_lightsafetyexample
 
 % Run with real data
+% load('C:\Users\cege-user\Dropbox\UCL\Data\LargeSphere\Hardware Data\Filter spectra\Vision dome spectrum - no filter.mat')
+% radianceWattsPerM2Sr = SplineSpd([380,4,101],spc,S);
+
 load('C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Hardware Specs\Light Safety\lightson.mat')
 radianceWattsPerM2Sr = SplineSpd([380,4,101],spc(:,2),S);
+
 radianceWattsPerM2Sr(radianceWattsPerM2Sr < 0) = 0;
 clearvars -except radianceWattsPerM2Sr S
 

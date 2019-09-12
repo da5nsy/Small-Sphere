@@ -9,6 +9,7 @@ for ob = 1:length(d)
     SmallSphereCalibrationCheck(d(ob).name)
 end
 
+
 %%
 
 SmallSphereCalibrationCheck('Characterization without LEDs')

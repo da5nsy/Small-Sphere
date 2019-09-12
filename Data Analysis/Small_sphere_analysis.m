@@ -65,6 +65,13 @@ for trial=1:length(files)
         end
     end
     
+    % I think the following normalisation is required but I don't have time to think
+    % clearly about this now. This might exaplain why, although we
+    % specificed L* = 30:10:70 in the experiment, the calibrated values are
+    % higher.  
+    %
+    % files(trial).screenxyY = files(trial).screenxyY/XYZ(2,end,4)*100;
+    
     files(trial).screenXYZw = XYZ(:,end,4)/XYZ(2,end,4)*100;
     files(trial).screenxyw  = files(trial).screenxyY(:,end,end);
     
@@ -107,16 +114,8 @@ for trial=1:length(files)
     end
 end
 
-% % Plot display white points
+%% Plot data
 
-
-figure, hold on
-drawChromaticity('1931')
-for trial = 1:length(files)
-    scatter(files(trial).screenxyw(1),files(trial).screenxyw(2),'k')
-end
-
-%%
 if strcmp(obs,'ALL')
     figure, hold on
 else
@@ -159,14 +158,15 @@ if strcmp(colSpace,'LAB')
                     if j == 1
                         view(2)
                         axis equal
+                        %xlim(xlim + 30)
                         xlim([-50 200])
                         legend('Location','best')
                     elseif j == 2
                         view(0,0)
-                        daspect([1,1,3])
+                        daspect([1,1,2])
                     elseif j == 3
                         view(-90,0)
-                        daspect([1,1,3])
+                        daspect([1,1,2])
                     end
                     xlabel('a*')
                     ylabel('b*')
@@ -193,9 +193,8 @@ elseif strcmp(colSpace,'xy')
     ylabel('y')
     zlabel('Y')
 end
-%legend('Location','best')
 
-save2pdf([figfile,obs])
+%save2pdf([figfile,obs])
 
 %% Plot ellipses to summarise all data
 
@@ -220,7 +219,7 @@ for i = [9,6,8,3,5,4,10,2,7,1]
             disp('Something gone wrong')
         end
         if contains(files(i).name,'2017-10') % If it's a repeat, make it darker
-            a.Color = (a.Color/2);
+            a.Color = (a.Color/1.5)+[0,0.5,0];
         end
         if contains(files(i).name,'HC')
             a.LineStyle = ':';
@@ -232,10 +231,11 @@ end
 axis equal
 xlim([-20,67])
 ylim([-55,55])
-
+xlabel('a*')
+ylabel('b*')
 legend('Location','southeast')
 
-save2pdf([figfile,'SSsummary.pdf'])
+%save2pdf([figfile,'SSsummary.pdf'])
 
 %% Add Ocean Optics LED values
 
@@ -273,40 +273,42 @@ end
 
 %% Add gamut
 
-%figure, hold on
-%drawChromaticity
+vals = [1,4,6,8,10,12,15,18,21];
+
+figure('DefaultAxesColorOrder',cbrewer('qual', 'Set1' , length(vals))), hold on
+drawChromaticity
 daspect([1,1,100])
 for j = 1:length(files)
-    for i = 1:3:size(files(j).screenxyY,2)
+    for i = vals
         plot3(squeeze(files(j).screenxyY(1,i,[1,2,3,1])),...
             squeeze(files(j).screenxyY(2,i,[1,2,3,1])),...
-            squeeze(files(j).screenxyY(3,i,[1,2,3,1])));
+            squeeze(files(j).screenxyY(3,i,[1,2,3,1])),...
+            'DisplayName',num2str(sval(i)));
         
     end
-    ax = gca;
-    ax.ColorOrderIndex = 1;
+    if j == 1
+        legend('Location','best','AutoUpdate','off')
+    end
 end
 
-% make it one colour per file
+%figure,
+for trial = 1:length(files)
+    if trial == length(files)
+        legend('AutoUpdate','on')
+    end
+    scatter3(files(trial).screenxyw(1),files(trial).screenxyw(2),100,'k',...
+        'DisplayName','Wt-Pts')   
+end
+%save2pdf([figfile,'SSgamut.pdf'])
 
+%% Secondary calibration
 
-% % Note that this is just for the last loaded characterization
-% figure, hold on
-% screen_xy = zeros(2,21,4);
-% for i=21%1:21
-%     for j=1:4
-%         screen_xy(1,i,j) = XYZ(1,i,j)./sum(XYZ(:,i,j));
-%         screen_xy(2,i,j) = XYZ(2,i,j)./sum(XYZ(:,i,j));
-%     end
-%     plot3(squeeze(screen_xy(1,i,[1,2,3,1])),...
-%         squeeze(screen_xy(2,i,[1,2,3,1])),...
-%         squeeze(XYZ(2,i,[1,2,3,1])),'k:');
-% end
+SmallSphereCalibrationCheck('2017-7-21-9-29_LW_RB')
 
-
-
+%save2pdf([figfile,'SSseccal.pdf'])
 
 %% Plot all data in CIE 1931 xy, showing time as marker size
+% Needs checking, haven't used in a long time
 
 % %obs = 'DG';
 % markerSize=(1:150).^1.5;
@@ -337,25 +339,57 @@ end
 % zlabel('Y')
 % set(gca, 'DataAspectRatio', [repmat(min(diff(get(gca, 'XLim')), diff(get(gca, 'YLim'))), [1 2]) diff(get(gca, 'ZLim'))])
 
-%% Stats
+%% Means and standard deviations
 for i=1:length(files)
-    m(i,:)  = mean(files(i).dataxy(:,:),2);
-    sd(i,:) = std(files(i).dataxy(:,:),[],2);
+    m(i,:)  = mean(files(i).dataLABcal(:,:),2);
+    sd(i,:) = std(files(i).dataLABcal(:,:),[],2);
+end
+
+order = [9,6,8,3,5,4,10,2,7,1];
+% Getting them in a sensible order
+mOrder = m(order,:);
+sdOrder = sd(order,:);
+for i=1:length(order)
+    namesOrder{i} = {sprintf('%s-%s-%s',files(order(i)).name(end-8:end-7),files(order(i)).name(end-5:end-4),files(order(i)).name(6:10))};
 end
 
 % figure, hold on
-% drawChromaticity
-% scatter(m(:,1),m(:,2),'k')
+% scatter3(m(:,2),m(:,3),m(:,1),'k')
+% daspect([1,1,2])
+% 
+% xlabel('a*')
+% ylabel('b*')
+% zlabel('L*')
 
-[H(1), pValue(1)] = kstest_2s_2d(files(6).dataxy(:,:)', files(9).dataxy(:,:)', 0.05); %DG
-[H(2), pValue(2)] = kstest_2s_2d([files(1).dataxy(:,:)';files(7).dataxy(:,:)'],...
-    [files(2).dataxy(:,:)';files(10).dataxy(:,:)'], 0.05); %LW
-[H(3), pValue(3)] = kstest_2s_2d([files(3).dataxy(:,:)';files(8).dataxy(:,:)'],...
-    [files(4).dataxy(:,:)';files(5).dataxy(:,:)'], 0.05); %HC
+%% Stats on xy
 
+[Hxy(1), pValuexy(1)] = kstest_2s_2d(files(6).dataxycal(1:2,:)', files(9).dataxycal(1:2,:)', 0.05); %DG
+[Hxy(2), pValuexy(2)] = kstest_2s_2d([files(3).dataxycal(1:2,:)';files(8).dataxycal(1:2,:)'],...
+    [files(4).dataxycal(1:2,:)';files(5).dataxycal(1:2,:)'], 0.05); %HC
+[Hxy(3), pValuexy(3)] = kstest_2s_2d([files(1).dataxycal(1:2,:)';files(7).dataxycal(1:2,:)'],...
+    [files(2).dataxycal(1:2,:)';files(10).dataxycal(1:2,:)'], 0.05); %LW
+
+%% Stats on LAB
+
+[HLAB(1), pValueLAB(1)] = kstest_2s_2d(files(6).dataLABcal(2:3,:)', files(9).dataLABcal(2:3,:)', 0.05); %DG
+[HLAB(2), pValueLAB(2)] = kstest_2s_2d([files(3).dataLABcal(2:3,:)';files(8).dataLABcal(2:3,:)'],...
+    [files(4).dataLABcal(2:3,:)';files(5).dataLABcal(2:3,:)'], 0.05); %HC
+[HLAB(3), pValueLAB(3)] = kstest_2s_2d([files(1).dataLABcal(2:3,:)';files(7).dataLABcal(2:3,:)'],...
+    [files(2).dataLABcal(2:3,:)';files(10).dataLABcal(2:3,:)'], 0.05); %LW
+
+%megastats
+
+for i = 1:length(files)
+    for j = 1:length(files)
+        [HLABmega(i,j), pValueLABmega(i,j)] = kstest_2s_2d(files(i).dataLABcal(2:3,:)', files(j).dataLABcal(2:3,:)', 0.05/45);
+    end
+end
+    
 stats.m  = m;
 stats.sd = sd;
-stats.H  = H;
-stats.p  = pValue;
+stats.H  = HLAB;
+stats.p  = pValueLAB;
+
+
 
 end

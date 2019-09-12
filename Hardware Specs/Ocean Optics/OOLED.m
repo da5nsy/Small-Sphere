@@ -19,7 +19,7 @@ r = rmfield(r,{'date','bytes','isdir','datenum'});
 %%
 for i=1:length(r)
     disp(r(i).name)
-    [~,r(i).xyY,r(i).startP,r(i).endP] = OO_smallSphere_002(r(i).name);
+    [~,r(i).xyY,r(i).startP,r(i).endP,r(i).MP] = OO_smallSphere_002(r(i).name);
 end
 
 % Would be nice to rewrite this so that it could all be loaded from the

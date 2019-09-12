@@ -1,4 +1,4 @@
-function [SPDav,xyY,startP,endP] = OO_smallSphere_002(obs)
+function [SPDav,xyY,startP,endP,MP] = OO_smallSphere_002(obs)
 %Handles data collected with the Ocean Optics USB 2000+ during small sphere
 %experiments, measuring the interior chromaticity of the sphere at 5 second
 %intervals
@@ -112,13 +112,15 @@ wavelength = LEDrad(:,1,1);
 % Same goes for chromaticity except all the chromaticities are shown.
 
 load T_xyz1931.mat T_xyz1931 S_xyz1931
+load T_melanopsin.mat T_melanopsin S_melanopsin
 
 wlSi = 107;  %wavelength start
 wlEi = 1231; %wavelength end
 
 %Interpolates CIEdata to fit OO wavelength intervals
 % T_xyz1931 = SplineCmf(S_xyz1931,T_xyz1931,wavelength(wlSi:wlEi)); %can't do this  because PTB needs evenly spaced samples
-T_xyz1931 = interp1(SToWls(S_xyz1931),T_xyz1931',wavelength(wlSi:wlEi),'spline'); % roughly 380:780
+T_xyz1931    = interp1(SToWls(S_xyz1931),T_xyz1931',wavelength(wlSi:wlEi),'spline'); % roughly 380:780
+T_melanopsin = interp1(SToWls(S_melanopsin),T_melanopsin',wavelength(wlSi:wlEi),'spline'); % roughly 380:780
 
 if exist('dfc','var')
     SPD = squeeze((LEDrad(wlSi:wlEi,2,:)-dfc(wlSi:wlEi)).*correction_vector(wlSi:wlEi));
@@ -202,12 +204,15 @@ wl = wavelength(wlSi:wlEi);
 %SPDshort = SPD(:,startP:endP);
 SPDav = median(SPD(:,startP:endP),2);
 
+
+MP  = median(SPD(:,startP:endP)'*T_melanopsin); %melanopic power
+
 % I'm turning off automatic save for this because it seems to create new
 % versions each time I run it even though nothing changes. Best guess - a
 % new timestamp makes git think that something has changed (!?). Would be
 % unusual but that's all I can figure.
 
-%save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics Summary\',obs,'summary.mat'],'wl','SPDav','xyY')
+%save(['C:\Users\cege-user\Dropbox\Documents\MATLAB\SmallSphere\Data\Run 2 data\Ocean Optics Summary\',obs,'summary.mat'],'wl','SPDav','xyY','MP')
 
 end
 
