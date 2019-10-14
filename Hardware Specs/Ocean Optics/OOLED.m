@@ -30,7 +30,7 @@ end
 
 if plt
     figure, hold on
-    drawChromaticity('1931')
+    DrawChromaticity('1931')
     for i = 1:length(r)
         r(i).med_xyY = [median(r(i).xyY(1,r(i).startP:r(i).endP)),...
             median(r(i).xyY(2,r(i).startP:r(i).endP)),...
@@ -48,7 +48,7 @@ if plt
     ds = 30; %downsample. You don't need all the chromaticities.
     
     figure, hold on
-    drawChromaticity('1931')
+    DrawChromaticity('1931')
     for i = 1:length(r)
         scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
             'filled','MarkerEdgeAlpha',0.1,'MarkerFaceAlpha',0.1)

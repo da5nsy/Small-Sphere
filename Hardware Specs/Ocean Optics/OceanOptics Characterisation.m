@@ -165,7 +165,7 @@ UVA_xy(1)=UVA_XYZ(1)/sum(UVA_XYZ);
 UVA_xy(2)=UVA_XYZ(2)/sum(UVA_XYZ);
 
 figure, hold on
-drawChromaticity('1931') % github.com/da5nsy/General
+DrawChromaticity('1931') % github.com/da5nsy/General
 
 scatter(RB_xy(1),RB_xy(2),'r')
 text(RB_xy(1),RB_xy(2),'RB')
@@ -222,7 +222,7 @@ U_xy(1)=U_XYZ(1)/sum(U_XYZ);
 U_xy(2)=U_XYZ(2)/sum(U_XYZ);
 
 figure, hold on
-drawChromaticity('1931')
+DrawChromaticity('1931')
 
 plot([U_xy(1),A_xy(1)],[U_xy(2),A_xy(2)],'k')
 plot([R_xy(1),B_xy(1)],[R_xy(2),B_xy(2)],'k')

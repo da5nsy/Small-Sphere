@@ -129,7 +129,7 @@ end
 %% Compare
 
 figure, hold on
-drawChromaticity
+DrawChromaticity
 
 files_xyr  = reshape(files.dataxycal,3,15);
 scatter3(files_xyr(1,1:14),files_xyr(2,1:14),files_xyr(3,1:14),'r*','DisplayName','Internally saved')

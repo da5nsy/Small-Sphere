@@ -176,7 +176,7 @@ if strcmp(colSpace,'LAB')
         end
     end
 elseif strcmp(colSpace,'xy')
-    %drawChromaticity('1931','line')
+    %DrawChromaticity('1931','line')
     for i = 1:length(files)
         if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
             scatter3(files(i).dataxycal(1,:),files(i).dataxycal(2,:),files(i).dataXYZcal(2,:),markerSize,'filled',...
@@ -199,7 +199,7 @@ end
 %% Plot ellipses to summarise all data
 
 figure('Position',[100 100 500 600]), hold on
-%drawChromaticity
+%DrawChromaticity
 for i = [9,6,8,3,5,4,10,2,7,1]
     if (strcmp(files(i).name(end-8:end-7),obs) || (strcmp(obs,'ALL')))
         data(:,:,:,i) = files(i).dataLABcal;
@@ -246,7 +246,7 @@ end
 ds = 30; %downsample. You don't need all the chromaticities.
 
 figure, hold on
-drawChromaticity('1931')
+DrawChromaticity('1931')
 for i = 1:length(r)
     b = scatter3(r(i).xyY(1,r(i).startP:ds:r(i).endP),r(i).xyY(2,r(i).startP:ds:r(i).endP),r(i).xyY(3,r(i).startP:ds:r(i).endP),...
         'filled','MarkerEdgeAlpha',0.1,'MarkerFaceAlpha',0.1,...
@@ -276,7 +276,7 @@ end
 vals = [1,4,6,8,10,12,15,18,21];
 
 figure('DefaultAxesColorOrder',cbrewer('qual', 'Set1' , length(vals))), hold on
-drawChromaticity
+DrawChromaticity
 daspect([1,1,100])
 for j = 1:length(files)
     for i = vals
