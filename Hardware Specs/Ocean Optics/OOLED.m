@@ -9,7 +9,7 @@ function r = OOLED
 % Display Settings
 DGdisplaydefaults;
 
-plt = 0;
+plt = 1;
 
 %%
 

@@ -13,4 +13,3 @@ end
 %%
 
 SmallSphereCalibrationCheck('Characterization without LEDs')
-
